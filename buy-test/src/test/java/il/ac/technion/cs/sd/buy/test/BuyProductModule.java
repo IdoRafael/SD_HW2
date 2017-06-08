@@ -17,9 +17,9 @@ public class BuyProductModule extends AbstractModule {
   protected void configure() {
     bind(BuyProductInitializer.class).to(BuyProductInitializerImpl.class);
     bind(BuyProductReader.class).to(BuyProductReaderImpl.class);
-    install(new FactoryModuleBuilder()
+    /*install(new FactoryModuleBuilder()
             .implement(Storage.class, StringStorage.class)
-            .build(StorageFactory.class));
+            .build(StorageFactory.class));*/
 
     bind(String.class)
             .annotatedWith(Names.named("reviewersFileName"))

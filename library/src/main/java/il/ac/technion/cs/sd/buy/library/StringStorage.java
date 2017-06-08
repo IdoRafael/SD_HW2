@@ -2,8 +2,6 @@ package il.ac.technion.cs.sd.buy.library;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import il.ac.technion.cs.sd.book.ext.LineStorage;
-import il.ac.technion.cs.sd.book.ext.LineStorageFactory;
 
 import java.util.*;
 
