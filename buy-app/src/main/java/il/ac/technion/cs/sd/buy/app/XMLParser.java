@@ -14,6 +14,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -27,12 +28,6 @@ public class XMLParser {
 
     public static SortedMap<String,String> parseXMLToSortedMap(String xml) {
 
-        Comparator<String> csvStringComparator = Comparator
-                .comparing((String s) -> s.split(DELIMITER)[0])
-                .thenComparing((String s)-> s.split(DELIMITER)[1]);
-
-        SortedMap<String, String> sortedByTwoKeys = new TreeMap<>(csvStringComparator);
-
         Document document = null;
 
         try {
@@ -41,28 +36,6 @@ public class XMLParser {
             InputSource is = new InputSource(new StringReader(xml));
             document = builder.parse(is);
 
-/*            XPathFactory xpathFactory = XPathFactory.newInstance();
-            XPath xpath = xpathFactory.newXPath();
-            XPathExpression expr = xpath.compile(query);
-
-            NodeList reviewList = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
-
-            for (int i = 0; i < reviewList.getLength(); ++i) {
-                Node reviewNode = reviewList.item(i);
-                if (reviewNode.getNodeType() == Node.ELEMENT_NODE) {
-                    String primaryId = reviewNode.getParentNode().getAttributes().getNamedItem("Id").getTextContent();
-                    String secondaryId = reviewNode.getChildNodes().item(1).getTextContent();
-                    String value = reviewNode.getChildNodes().item(3).getTextContent();
-
-                    String keys;
-                    if (swapKeys) {
-                        keys = String.join(DELIMITER, secondaryId, primaryId);
-                    } else {
-                        keys = String.join(DELIMITER, primaryId, secondaryId);
-                    }
-                    sortedByTwoKeys.put(keys , value);
-                }
-            }*/
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -70,7 +43,9 @@ public class XMLParser {
         parseProducts(document);
         parseOrders(document);
 
-
+        for (Map.Entry<String,Order> entry : orders.entrySet()){
+            System.out.println(entry.getValue().getUserId() + " " + entry.getValue().getProductId() + " " + entry.getValue().getLatestAmount());
+        }
         return products;
     }
 
@@ -95,6 +70,13 @@ public class XMLParser {
                 switch (node.getNodeName()) {
                     case "Order":
                         handleOrder(node);
+                        break;
+                    case "ModifyOrder":
+                        modifyOrder(node);
+                        break;
+                    case "CancelOrder":
+                        cancelOrder(node);
+                        break;
                     default:
                         break;
                 }
@@ -103,8 +85,31 @@ public class XMLParser {
     }
 
     private static void handleOrder(Node node){
-
+        String productId = ((Element) node).getElementsByTagName("product-id").item(0).getTextContent();
+        if (!products.containsKey(productId)) {
+            return;
+        }
+        String userId = ((Element) node).getElementsByTagName("user-id").item(0).getTextContent();
+        String orderId = ((Element) node).getElementsByTagName("order-id").item(0).getTextContent();
+        String amount = ((Element) node).getElementsByTagName("amount").item(0).getTextContent();
+        orders.put(orderId, new Order(orderId, userId, productId, Integer.parseInt(amount)));
     }
 
+    private static void modifyOrder(Node node){
+        String orderId = ((Element) node).getElementsByTagName("order-id").item(0).getTextContent();
+        if (!orders.containsKey(orderId)){
+            return;
+        }
+        String newAmount = ((Element) node).getElementsByTagName("new-amount").item(0).getTextContent();
+        orders.get(orderId).setCancelled(false);
+        orders.get(orderId).modifyAmount(Integer.parseInt(newAmount));
+    }
 
+    private static void cancelOrder(Node node){
+        String orderId = ((Element) node).getElementsByTagName("order-id").item(0).getTextContent();
+        if (!orders.containsKey(orderId)) {
+            return;
+        }
+        orders.get(orderId).setCancelled(true);
+    }
 }
