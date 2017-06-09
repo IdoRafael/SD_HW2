@@ -3,25 +3,23 @@ package il.ac.technion.cs.sd.buy.app;
 import java.util.ArrayList;
 import java.util.List;
 
-class Order {
-    String orderId;
-    String userId;
-    String productId;
-
-    //TODO IDO - can JSON notation of number contain leading zero? ask SHAI
-    Integer initialAmount;
-
-    boolean isCancelled;
-    List<Integer> modificationsAmount;
+public class Order{
+    private String orderId;
+    private String userId;
+    private String productId;
+    private Integer latestAmount;
+    private boolean isCancelled;
+    private List<Integer> amountHistory;
 
     public Order(String orderId, String userId, String productId, Integer initialAmount) {
         this.orderId = orderId;
         this.userId = userId;
         this.productId = productId;
-        this.initialAmount = initialAmount;
+        this.latestAmount = initialAmount;
 
         this.isCancelled = false;
-        modificationsAmount = new ArrayList<>();
+        amountHistory = new ArrayList<>();
+        amountHistory.add(initialAmount);
     }
 
     public String getOrderId() {
@@ -36,16 +34,20 @@ class Order {
         return productId;
     }
 
-    public Integer getInitialAmount() {
-        return initialAmount;
+    public Integer getLatestAmount() {
+        return latestAmount;
     }
 
     public boolean isCancelled() {
         return isCancelled;
     }
 
-    public List<Integer> getModificationsAmount() {
-        return modificationsAmount;
+    public boolean isModified() {
+        return amountHistory.size() > 1;
+    }
+
+    public List<Integer> getAmountHistory() {
+        return amountHistory;
     }
 
     public void setCancelled(boolean cancelled) {
@@ -53,7 +55,7 @@ class Order {
     }
 
     public void addModification(Integer amount) {
-        modificationsAmount.add(amount);
+        amountHistory.add(amount);
         setCancelled(false);
     }
 }

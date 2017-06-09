@@ -1,3 +1,4 @@
+/*
 package il.ac.technion.cs.sd.buy.library;
 
 import com.google.inject.assistedinject.Assisted;
@@ -130,3 +131,4 @@ public class StringStorage extends AbstractList<String> implements RandomAccess,
         return keyFound;
     }
 }
+*/
