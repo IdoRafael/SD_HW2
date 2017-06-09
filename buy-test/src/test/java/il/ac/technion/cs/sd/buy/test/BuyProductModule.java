@@ -9,7 +9,7 @@ import il.ac.technion.cs.sd.buy.app.BuyProductReader;
 import il.ac.technion.cs.sd.buy.app.BuyProductReaderImpl;
 import il.ac.technion.cs.sd.buy.library.Storage;
 import il.ac.technion.cs.sd.buy.library.StorageFactory;
-import il.ac.technion.cs.sd.buy.library.StringStorage;
+//import il.ac.technion.cs.sd.buy.library.StringStorage;
 
 // This module is in the testing project, so that it could easily bind all dependencies from all levels.
 public class BuyProductModule extends AbstractModule {
