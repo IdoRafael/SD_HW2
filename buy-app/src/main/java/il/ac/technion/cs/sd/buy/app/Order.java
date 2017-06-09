@@ -54,8 +54,9 @@ public class Order{
         isCancelled = cancelled;
     }
 
-    public void addModification(Integer amount) {
-        amountHistory.add(amount);
+    public void modifyAmount(Integer newAmount) {
+        latestAmount = newAmount;
+        amountHistory.add(newAmount);
         setCancelled(false);
     }
 }
