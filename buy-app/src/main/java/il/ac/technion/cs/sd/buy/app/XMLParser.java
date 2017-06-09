@@ -26,7 +26,7 @@ public class XMLParser {
     private static SortedMap<String, Order> orders = new TreeMap<>();
 
 
-    public static SortedMap<String,String> parseXMLToSortedMap(String xml) {
+    public static void parseXMLToSortedMap(String xml) {
 
         Document document = null;
 
@@ -43,10 +43,20 @@ public class XMLParser {
         parseProducts(document);
         parseOrders(document);
 
-        for (Map.Entry<String,Order> entry : orders.entrySet()){
-            System.out.println(entry.getValue().getUserId() + " " + entry.getValue().getProductId() + " " + entry.getValue().getLatestAmount());
+        System.out.println("Products");
+        for (Map.Entry<String,String> entry : products.entrySet()){
+            System.out.println(entry.getKey() + " " + entry.getValue());
         }
-        return products;
+        System.out.println("Orders");
+        for (Map.Entry<String,Order> entry : orders.entrySet()){
+            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
+                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
+            System.out.print("amount history: ");
+            for(Integer amount : entry.getValue().getAmountHistory()){
+                System.out.print(amount + " ");
+            }
+            System.out.println("");
+        }
     }
 
     private static void parseProducts(Document document) {
@@ -56,7 +66,6 @@ public class XMLParser {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 String id = ((Element) node).getElementsByTagName("id").item(0).getTextContent();
                 String price = ((Element) node).getElementsByTagName("price").item(0).getTextContent();
-                System.out.println(id + " " + price);
                 products.put(id, price);
             }
         }
