@@ -1,14 +1,16 @@
-/*
 package il.ac.technion.cs.sd.buy.library;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
+import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 
-public class StringStorage extends AbstractList<String> implements RandomAccess, Storage {
-    private LineStorage lineStorage;
+public class StringStorage extends AbstractList<CompletableFuture<String>> implements RandomAccess, Storage {
+    private CompletableFuture<FutureLineStorage> futureLineStorage;
     private boolean sizeIsValid = false;
     private int size = 0;
 
@@ -16,31 +18,32 @@ public class StringStorage extends AbstractList<String> implements RandomAccess,
 
     @AssistedInject
     public StringStorage(
-            LineStorageFactory lineStorageFactory,
+            FutureLineStorageFactory lineStorageFactory,
             @Assisted String fileName
     ) {
-        this.lineStorage = lineStorageFactory.open(fileName);
+        this.futureLineStorage = lineStorageFactory.open(fileName);
         sizeIsValid = false;
     }
 
     @AssistedInject
     public StringStorage(
-             LineStorageFactory lineStorageFactory,
+            FutureLineStorageFactory lineStorageFactory,
              @Assisted("fileName") String fileName,
-             @Assisted("xmlString") String xmlString,
-             @Assisted("xmlQuery") String xmlQuery,
-             @Assisted("swapKeys") boolean swapKeys
+             @Assisted SortedMap<String, String> sortedMap
     ) {
         this(lineStorageFactory, fileName);
-        SortedMap<String, String> sortedMap = XMLParser.parseXMLToSortedMap(xmlString, xmlQuery, swapKeys);
-        sortedMap.forEach((k, v) -> lineStorage.appendLine(String.join(DELIMITER, k,v)));
+        sortedMap.forEach(
+                (k, v) -> futureLineStorage.thenApply(
+                        futureLineStorage -> futureLineStorage.appendLine(String.join(DELIMITER, k,v))
+                )
+        );
         sizeIsValid = false;
     }
 
     @Override
     public String get(int index) {
         try {
-            return lineStorage.read(index);
+            return futureLineStorage.read(index);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +55,7 @@ public class StringStorage extends AbstractList<String> implements RandomAccess,
             if (sizeIsValid) {
                 return size;
             } else {
-                size = lineStorage.numberOfLines();
+                size = futureLineStorage.numberOfLines();
                 sizeIsValid = true;
                 return size;
             }
@@ -131,4 +134,3 @@ public class StringStorage extends AbstractList<String> implements RandomAccess,
         return keyFound;
     }
 }
-*/
