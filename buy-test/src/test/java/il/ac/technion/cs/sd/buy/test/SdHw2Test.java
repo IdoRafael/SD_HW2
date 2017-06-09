@@ -11,11 +11,11 @@ import java.util.Scanner;
 
 public class SdHw2Test {
 
-    @Rule
+/*    @Rule
     public Timeout globalTimeout = Timeout.seconds(30);
 
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public ExpectedException thrown = ExpectedException.none();*/
 
     public static String getFilesContent(String fileName) throws FileNotFoundException {
         return new Scanner(new File(XMLParserTest.class.getResource(fileName).getFile())).useDelimiter("\\Z").next();

@@ -33,21 +33,13 @@ public class XMLParser {
 
         SortedMap<String, String> sortedByTwoKeys = new TreeMap<>(csvStringComparator);
 
+        Document document = null;
 
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xml));
-            if (is == null){
-                System.out.println("NULLLLLL");
-            }
-            System.out.println("NOT NULLLLLL");
-            Document document = builder.parse(is);
-
-            parseProducts(document);
-            parseOrders(document);
-
-
+            document = builder.parse(is);
 
 /*            XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
@@ -75,15 +67,19 @@ public class XMLParser {
             throw new RuntimeException(e);
         }
 
+        parseProducts(document);
+        parseOrders(document);
+
+
         return products;
     }
 
     private static void parseProducts(Document document) {
         NodeList nodeList = document.getElementsByTagName("Product");
-        for (int i = 0; i < nodeList.getLength(); i++) {
+        for (int i = 0; i < nodeList.getLength(); ++i) {
             Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                String id = ((Element) node).getElementsByTagName("product-id").item(0).getTextContent();
+                String id = ((Element) node).getElementsByTagName("id").item(0).getTextContent();
                 String price = ((Element) node).getElementsByTagName("price").item(0).getTextContent();
                 System.out.println(id + " " + price);
                 products.put(id, price);
@@ -93,7 +89,7 @@ public class XMLParser {
 
     private static void parseOrders(Document document){
         NodeList nodeList = document.getChildNodes().item(0).getChildNodes();
-        for (int i=0 ; i < nodeList.getLength() ; i++) {
+        for (int i=0 ; i < nodeList.getLength() ; ++i) {
             Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 switch (node.getNodeName()) {
