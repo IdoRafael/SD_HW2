@@ -10,7 +10,8 @@ public class Order{
     private Integer productPrice;
     private Integer latestAmount;
     private boolean isCancelled;
-    private List<Integer> amountHistory;
+    private boolean isModified;
+    private List<Integer> amountHistory = new ArrayList<>();
 
     public Order(String orderId, String userId, String productId, Integer initialAmount, Integer productPrice) {
         this.orderId = orderId;
@@ -20,8 +21,35 @@ public class Order{
         this.productPrice = productPrice;
 
         this.isCancelled = false;
-        amountHistory = new ArrayList<>();
+        this.isModified = false;
         amountHistory.add(initialAmount);
+    }
+
+    public Order(String csvString) {
+        String[] splitString = csvString.split(",");
+        this.orderId = splitString[0];
+        this.userId = splitString[1];
+        this.productId = splitString[2];
+        this.latestAmount = Integer.parseInt(splitString[3]);
+        this.productPrice = Integer.parseInt(splitString[4]);
+        this.isCancelled = stringToBoolean(splitString[5]);
+        this.isModified = stringToBoolean(splitString[6]);
+
+        amountHistory.add(latestAmount);
+    }
+
+    @Override
+    public String toString() {
+        return String.join(
+                ",",
+                orderId,
+                userId,
+                productId,
+                latestAmount.toString(),
+                productPrice.toString(),
+                serializeBoolean(isCancelled()),
+                serializeBoolean(isModified())
+        );
     }
 
     public String getOrderId() {
@@ -36,6 +64,10 @@ public class Order{
         return productId;
     }
 
+    public Integer getProductPrice() {
+        return productPrice;
+    }
+
     public Integer getLatestAmount() {
         return latestAmount;
     }
@@ -45,7 +77,7 @@ public class Order{
     }
 
     public boolean isModified() {
-        return amountHistory.size() > 1;
+        return isModified || amountHistory.size() > 1;
     }
 
     public List<Integer> getAmountHistory() {
@@ -60,5 +92,13 @@ public class Order{
         latestAmount = newAmount;
         amountHistory.add(newAmount);
         setCancelled(false);
+    }
+
+    private String serializeBoolean(Boolean b) {
+        return b ? "1" : "0";
+    }
+
+    private Boolean stringToBoolean(String s) {
+        return s.equals("1");
     }
 }

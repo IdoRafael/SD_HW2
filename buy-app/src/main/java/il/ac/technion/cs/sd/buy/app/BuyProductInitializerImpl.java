@@ -56,7 +56,6 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
     }
 
     private CompletableFuture<Void> setup(Parser parser) {
-        SortedMap<String, String> products = parser.getProducts();
         SortedMap<String, Order> orders = parser.getOrders();
 
         Comparator<String> csvStringComparator = Comparator
@@ -82,11 +81,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
         orders.forEach(
                 (k, order) -> usersAndOrders.put(
                         String.join(DELIMITER, order.getUserId(), order.getOrderId()),
-                        String.join(DELIMITER,
-                                order.getLatestAmount().toString(),
-                                serializeBoolean(order.isCancelled()),
-                                serializeBoolean(order.isModified())
-                        )
+                        order.toString()
                 )
         );
         return futureStorageFactory.create(
@@ -107,11 +102,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
         orders.forEach(
                 (k, order) -> ordersAndProducts.put(
                         String.join(DELIMITER, order.getOrderId(), order.getProductId()),
-                        String.join(DELIMITER,
-                                order.getLatestAmount().toString(),
-                                serializeBoolean(order.isCancelled()),
-                                serializeBoolean(order.isModified())
-                        )
+                        order.toString()
                 )
         );
         return futureStorageFactory.create(
@@ -162,10 +153,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
         orders.forEach(
                 (k, order) -> productsAndOrders.put(
                         String.join(DELIMITER, order.getProductId(), order.getOrderId()),
-                        String.join(DELIMITER,
-                                order.getLatestAmount().toString(),
-                                serializeBoolean(order.isCancelled())
-                        )
+                        order.toString()
                 )
         );
         return futureStorageFactory.create(
@@ -184,9 +172,5 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
 
     private CompletableFuture<FutureStorage> setupProductsAndUsers() {
         return completedFuture(null);
-    }
-
-    private String serializeBoolean(Boolean b) {
-        return b ? "1" : "0";
     }
 }
