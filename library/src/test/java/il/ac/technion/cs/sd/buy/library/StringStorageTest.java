@@ -26,9 +26,22 @@ public class StringStorageTest  {
     final int AMOUNT_TO_RETURN = 10;
 
     private static FutureLineStorageFactory setupLineStorageFactoryMock(final FutureLineStorage lineStorage) throws InterruptedException {
-        Mockito.when(lineStorage.numberOfLines()).thenReturn(completedFuture(LINE_STORAGE_SIZE));
+        Mockito.doAnswer(invocationOnMock -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+
+            }
+            return completedFuture(LINE_STORAGE_SIZE);
+        }).when(lineStorage).numberOfLines();
+
 
         Mockito.doAnswer(invocationOnMock -> {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+
+            }
             int i = (int)invocationOnMock.getArguments()[0];
             return completedFuture(String.join(",", "" + i/10, "" + i%10, "" + i%10));
         }).when(lineStorage).read(Mockito.anyInt());
@@ -39,7 +52,14 @@ public class StringStorageTest  {
         IntStream.range(0, LINE_STORAGE_SIZE)
                 .forEach(i -> sortedMap.put("" + i, ""));
 
-        return s -> completedFuture(lineStorage);
+        return s -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+
+            }
+            return completedFuture(lineStorage);
+        };
     }
 
     private static StringStorage setupStringStorage(final FutureLineStorage lineStorage) throws InterruptedException {
