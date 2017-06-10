@@ -14,6 +14,8 @@ public interface FutureStorage {
 
     CompletableFuture<Boolean> exists(String id0, String id1);
 
+    CompletableFuture<Boolean> existsBySingleId(String id0);
+
     CompletableFuture<Optional<String>> getStringByIds(String id0, String id1);
 
     CompletableFuture<Optional<String>> getSomeStringBySingleId(String id0);

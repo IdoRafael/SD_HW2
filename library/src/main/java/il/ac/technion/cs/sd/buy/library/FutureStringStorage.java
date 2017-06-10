@@ -69,6 +69,13 @@ public class FutureStringStorage implements FutureStorage {
     }
 
     @Override
+    public CompletableFuture<Boolean> existsBySingleId(String id0) {
+        return getSomeStringBySingleId(id0)
+                .thenApply(Optional::isPresent);
+    }
+
+
+    @Override
     public CompletableFuture<Optional<String>> getStringByIds(String id0, String id1) {
         return findIndexByTwoKeys(id0, id1)
                 .thenCompose(indexFound -> {
