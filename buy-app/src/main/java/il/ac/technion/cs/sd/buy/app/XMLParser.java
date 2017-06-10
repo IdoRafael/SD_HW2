@@ -110,7 +110,9 @@ public class XMLParser {
             return;
         }
         String newAmount = ((Element) node).getElementsByTagName("new-amount").item(0).getTextContent();
-        orders.get(orderId).setCancelled(false);
+
+        //no need to cancel, modifyAmount does this already
+        //orders.get(orderId).setCancelled(false);
         orders.get(orderId).modifyAmount(Integer.parseInt(newAmount));
     }
 

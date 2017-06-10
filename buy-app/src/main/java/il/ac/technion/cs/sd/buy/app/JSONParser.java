@@ -86,7 +86,8 @@ public class JSONParser {
             return;
         }
         int newAmount = jsonObject.get("amount").getAsInt();
-        orders.get(orderId).setCancelled(false);
+        //no need to cancel, modifyAmount does this already
+        //orders.get(orderId).setCancelled(false);
         orders.get(orderId).modifyAmount(newAmount);
     }
 
