@@ -110,7 +110,9 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 .getFuture();
     }
 
-    private CompletableFuture<FutureStorage> setupOrdersAndHistory(SortedMap<String, Order> orders) {
+    private CompletableFuture<FutureStorage> setupOrdersAndHistory(
+            SortedMap<String, Order> orders
+    ) {
         Comparator<String> csvStringHistoryComparator = Comparator
                 .comparing((String s) -> s.split(DELIMITER)[0])
                 .thenComparing((String s)-> Integer.parseInt(s.split(DELIMITER)[1]));
@@ -213,9 +215,5 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 )
                         .getFuture()
         );
-    }
-
-    private CompletableFuture<FutureStorage> setupProductsAndUsers() {
-        return completedFuture(null);
     }
 }
