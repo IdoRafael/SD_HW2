@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URL;
 import java.util.Scanner;
 
 /**
@@ -13,8 +12,7 @@ import java.util.Scanner;
 public class JSONParserTest {
 
     public static String getFilesContent(String fileName) throws FileNotFoundException {
-        URL x = JSONParserTest.class.getResource(fileName);
-        return new Scanner(new File(x.getFile())).useDelimiter("\\Z").next();
+        return new Scanner(new File(JSONParserTest.class.getResource(fileName).getFile())).useDelimiter("\\Z").next();
     }
 
     public void justRun(String fileName)throws FileNotFoundException {
