@@ -17,7 +17,7 @@ public class XMLParserTest {
 
     public void justRun(String fileName)throws FileNotFoundException {
         String xml = getFilesContent(fileName);
-        XMLParser.parseXMLToSortedMap(xml);
+        new XMLParser(xml);
     }
 
     @Test

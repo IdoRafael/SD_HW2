@@ -17,11 +17,16 @@ public class JSONParserTest {
 
     public void justRun(String fileName)throws FileNotFoundException {
         String json = getFilesContent(fileName);
-        JSONParser.parseJSONToSortedMap(json);
+        new JSONParser(json).print();
     }
 
     @Test
     public void smallTest() throws Exception{
         justRun("small.json");
+    }
+
+    @Test
+    public void smallTest2() throws Exception{
+        justRun("small_2.json");
     }
 }

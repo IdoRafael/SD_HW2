@@ -14,34 +14,26 @@ import java.util.TreeMap;
  * Created by Yaniv on 09/06/2017.
  */
 public class JSONParser {
+    private SortedMap<String, String> products = new TreeMap<>();
+    private SortedMap<String, Order> orders = new TreeMap<>();
 
-    private static SortedMap<String, String> products = new TreeMap<>();
-    private static SortedMap<String, Order> orders = new TreeMap<>();
-
-    public static void parseJSONToSortedMap(String json){
+    public JSONParser(String json){
         JsonElement jsonElement = new JsonParser().parse(json);
         JsonArray jsonArray = jsonElement.getAsJsonArray();
 
         parseProducts(jsonArray);
         parseOrders(jsonArray);
-
-        System.out.println("Products");
-        for (Map.Entry<String,String> entry : products.entrySet()){
-            System.out.println(entry.getKey() + " " + entry.getValue());
-        }
-        System.out.println("Orders");
-        for (Map.Entry<String,Order> entry : orders.entrySet()){
-            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
-                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
-            System.out.print("amount history: ");
-            for(Integer amount : entry.getValue().getAmountHistory()){
-                System.out.print(amount + " ");
-            }
-            System.out.println("");
-        }
     }
 
-    public static void parseProducts(JsonArray jsonArray){
+    public SortedMap<String, String> getProducts() {
+        return products;
+    }
+
+    public SortedMap<String, Order> getOrders() {
+        return orders;
+    }
+
+    private void parseProducts(JsonArray jsonArray){
         for (JsonElement element : jsonArray){
             JsonObject jsonObject = element.getAsJsonObject();
             if (jsonObject.get("type").getAsString().equals("product")){
@@ -50,7 +42,7 @@ public class JSONParser {
         }
     }
 
-    public static void parseOrders(JsonArray jsonArray){
+    private void parseOrders(JsonArray jsonArray){
         for (JsonElement element : jsonArray){
             JsonObject jsonObject = element.getAsJsonObject();
             switch (jsonObject.get("type").getAsString()) {
@@ -69,7 +61,7 @@ public class JSONParser {
         }
     }
 
-    private static void handleOrder(JsonObject jsonObject){
+    private void handleOrder(JsonObject jsonObject){
         String productId = jsonObject.get("product-id").getAsString();
         if (!products.containsKey(productId)) {
             return;
@@ -80,7 +72,7 @@ public class JSONParser {
         orders.put(orderId, new Order(orderId, userId, productId, amount));
     }
 
-    private static void modifyOrder(JsonObject jsonObject){
+    private void modifyOrder(JsonObject jsonObject){
         String orderId = jsonObject.get("order-id").getAsString();
         if (!orders.containsKey(orderId)){
             return;
@@ -91,11 +83,28 @@ public class JSONParser {
         orders.get(orderId).modifyAmount(newAmount);
     }
 
-    private static void cancelOrder(JsonObject jsonObject){
+    private void cancelOrder(JsonObject jsonObject){
         String orderId = jsonObject.get("order-id").getAsString();
         if (!orders.containsKey(orderId)) {
             return;
         }
         orders.get(orderId).setCancelled(true);
+    }
+
+    public void print() {
+        System.out.println("Products");
+        for (Map.Entry<String,String> entry : products.entrySet()){
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
+        System.out.println("Orders");
+        for (Map.Entry<String,Order> entry : orders.entrySet()){
+            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
+                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
+            System.out.print("amount history: ");
+            for(Integer amount : entry.getValue().getAmountHistory()){
+                System.out.print(amount + " ");
+            }
+            System.out.println("cancelled: " + entry.getValue().isCancelled());
+        }
     }
 }

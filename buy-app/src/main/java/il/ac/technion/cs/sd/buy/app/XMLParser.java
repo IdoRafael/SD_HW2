@@ -19,47 +19,33 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class XMLParser {
+    private SortedMap<String, String> products = new TreeMap<>();
+    private SortedMap<String, Order> orders = new TreeMap<>();
 
-    private static final String DELIMITER = ",";
-
-    private static SortedMap<String, String> products = new TreeMap<>();
-    private static SortedMap<String, Order> orders = new TreeMap<>();
-
-
-    public static void parseXMLToSortedMap(String xml) {
-
-        Document document = null;
-
+    public XMLParser(String xml) {
+        Document document;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xml));
             document = builder.parse(is);
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         parseProducts(document);
         parseOrders(document);
-
-        System.out.println("Products");
-        for (Map.Entry<String,String> entry : products.entrySet()){
-            System.out.println(entry.getKey() + " " + entry.getValue());
-        }
-        System.out.println("Orders");
-        for (Map.Entry<String,Order> entry : orders.entrySet()){
-            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
-                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
-            System.out.print("amount history: ");
-            for(Integer amount : entry.getValue().getAmountHistory()){
-                System.out.print(amount + " ");
-            }
-            System.out.println("");
-        }
     }
 
-    private static void parseProducts(Document document) {
+    public SortedMap<String, String> getProducts() {
+        return products;
+    }
+
+    public SortedMap<String, Order> getOrders() {
+        return orders;
+    }
+
+    private void parseProducts(Document document) {
         NodeList nodeList = document.getElementsByTagName("Product");
         for (int i = 0; i < nodeList.getLength(); ++i) {
             Node node = nodeList.item(i);
@@ -71,7 +57,7 @@ public class XMLParser {
         }
     }
 
-    private static void parseOrders(Document document){
+    private void parseOrders(Document document){
         NodeList nodeList = document.getChildNodes().item(0).getChildNodes();
         for (int i=0 ; i < nodeList.getLength() ; ++i) {
             Node node = nodeList.item(i);
@@ -93,7 +79,7 @@ public class XMLParser {
         }
     }
 
-    private static void handleOrder(Node node){
+    private void handleOrder(Node node){
         String productId = ((Element) node).getElementsByTagName("product-id").item(0).getTextContent();
         if (!products.containsKey(productId)) {
             return;
@@ -104,7 +90,7 @@ public class XMLParser {
         orders.put(orderId, new Order(orderId, userId, productId, Integer.parseInt(amount)));
     }
 
-    private static void modifyOrder(Node node){
+    private void modifyOrder(Node node){
         String orderId = ((Element) node).getElementsByTagName("order-id").item(0).getTextContent();
         if (!orders.containsKey(orderId)){
             return;
@@ -116,11 +102,28 @@ public class XMLParser {
         orders.get(orderId).modifyAmount(Integer.parseInt(newAmount));
     }
 
-    private static void cancelOrder(Node node){
+    private void cancelOrder(Node node){
         String orderId = ((Element) node).getElementsByTagName("order-id").item(0).getTextContent();
         if (!orders.containsKey(orderId)) {
             return;
         }
         orders.get(orderId).setCancelled(true);
+    }
+
+    public void print() {
+        System.out.println("Products");
+        for (Map.Entry<String,String> entry : products.entrySet()){
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
+        System.out.println("Orders");
+        for (Map.Entry<String,Order> entry : orders.entrySet()){
+            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
+                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
+            System.out.print("amount history: ");
+            for(Integer amount : entry.getValue().getAmountHistory()){
+                System.out.print(amount + " ");
+            }
+            System.out.println("cancelled: " + entry.getValue().isCancelled());
+        }
     }
 }
