@@ -123,21 +123,34 @@ public class BuyProductReaderImpl implements BuyProductReader {
                 .thenCompose(futureStorage -> futureStorage.getAllStringsById(orderId))
                 .thenApply(list -> {
                     List<Integer> historyList = new ArrayList<>(list.size());
-                    list.stream()
-                            .forEach(s -> historyList.add(Integer.parseInt(removeKey(s))));
+                    list.forEach(s -> historyList.add(Integer.parseInt(removeKey(s))));
                     return historyList;
-
                 });
     }
 
     @Override
     public CompletableFuture<List<String>> getOrderIdsForUser(String userId) {
-        return null;
+        return usersAndOrders
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
+                .thenApply(list -> {
+                    List<String> ordersList = new ArrayList<>(list.size());
+                    list.forEach(s -> ordersList.add(new Order(removeKey(s)).getOrderId()));
+                    return ordersList;
+                });
     }
 
     @Override
     public CompletableFuture<Long> getTotalAmountSpentByUser(String userId) {
-        return null;
+        return usersAndProducts
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
+                .thenApply(list -> {
+                    Long sum = 0L;
+                    for (String s: list) {
+                        Order order = new Order(removeKey(s));
+                        sum += order.getLatestAmount() * order.getProductPrice();
+                    }
+                    return sum;
+                });
     }
 
     @Override
