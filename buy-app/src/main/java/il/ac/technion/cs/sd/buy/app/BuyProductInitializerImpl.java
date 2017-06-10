@@ -5,10 +5,7 @@ import il.ac.technion.cs.sd.buy.library.FutureStorage;
 import il.ac.technion.cs.sd.buy.library.FutureStorageFactory;
 
 import javax.inject.Named;
-import java.util.Comparator;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
@@ -68,8 +65,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 setupOrdersAndProducts(orders, csvStringComparator),
                 setupOrdersAndHistory(orders),
                 setupProductsAndOrders(orders, csvStringComparator),
-                setupUsersAndProducts(),
-                setupProductsAndUsers()
+                setupUsersAndProducts(orders, csvStringComparator)
         );
     }
 
@@ -165,9 +161,58 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 .getFuture();
     }
 
-    private CompletableFuture<FutureStorage> setupUsersAndProducts() {
+    private CompletableFuture<Void> setupUsersAndProducts(
+            SortedMap<String, Order> orders,
+            Comparator<String> comparator
+    ) {
+        Map<String, Order> groupedOrders = new HashMap<>();
 
-        return completedFuture(null);
+        orders.forEach(
+                (k, v) -> {
+                    if (!v.isCancelled()) {
+                        String key = String.join(",", v.getUserId(), v.getProductId());
+                        Order oldOrder = groupedOrders.get(key);
+                        if (oldOrder != null){
+                            oldOrder.modifyAmount(oldOrder.getLatestAmount() + v.getLatestAmount());
+                        } else {
+                            groupedOrders.put(key, v);
+                        }
+                    }
+                }
+        );
+
+        SortedMap<String, String> usersAndProducts = new TreeMap<>(comparator);
+        SortedMap<String, String> productsAndUsers = new TreeMap<>(comparator);
+
+        groupedOrders.forEach(
+                (k, v) -> {
+                    usersAndProducts.put(
+                            String.join(",", v.getUserId(), v.getProductId()),
+                            v.toString()
+                    );
+                    productsAndUsers.put(
+                            String.join(",", v.getProductId(), v.getUserId()),
+                            v.toString()
+                    );
+                }
+        );
+
+        return allOf(
+                futureStorageFactory.create(
+                        usersAndProductsFileName,
+                        String::compareTo,
+                        String::compareTo,
+                        usersAndProducts
+                )
+                        .getFuture(),
+                futureStorageFactory.create(
+                        productsAndUsersFileName,
+                        String::compareTo,
+                        String::compareTo,
+                        productsAndUsers
+                )
+                        .getFuture()
+        );
     }
 
     private CompletableFuture<FutureStorage> setupProductsAndUsers() {
