@@ -26,9 +26,10 @@ public class StringStorageTest  {
     final int AMOUNT_TO_RETURN = 10;
 
     private static FutureLineStorageFactory setupLineStorageFactoryMock(final FutureLineStorage lineStorage) throws InterruptedException {
+        final int SLEEP_DURATION = 100;
         Mockito.doAnswer(invocationOnMock -> {
             try {
-                Thread.sleep(100);
+                Thread.sleep(SLEEP_DURATION);
             } catch (InterruptedException e) {
 
             }
@@ -38,7 +39,7 @@ public class StringStorageTest  {
 
         Mockito.doAnswer(invocationOnMock -> {
             try {
-                Thread.sleep(30);
+                Thread.sleep(SLEEP_DURATION / 2);
             } catch (InterruptedException e) {
 
             }
@@ -54,7 +55,7 @@ public class StringStorageTest  {
 
         return s -> {
             try {
-                Thread.sleep(100);
+                Thread.sleep(SLEEP_DURATION);
             } catch (InterruptedException e) {
 
             }
