@@ -1,6 +1,7 @@
 package il.ac.technion.cs.sd.buy.app;
 
 import com.google.inject.Inject;
+import il.ac.technion.cs.sd.buy.library.FutureStorage;
 import il.ac.technion.cs.sd.buy.library.FutureStorageFactory;
 
 import javax.inject.Named;
@@ -73,7 +74,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
         );
     }
 
-    private CompletableFuture<Void> setupUsersAndOrders(
+    private CompletableFuture<FutureStorage> setupUsersAndOrders(
             SortedMap<String, Order> orders,
             Comparator<String> comparator
     ) {
@@ -98,7 +99,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
 
     }
 
-    private CompletableFuture<Void> setupOrdersAndProducts(
+    private CompletableFuture<FutureStorage> setupOrdersAndProducts(
             SortedMap<String, Order> orders,
             Comparator<String> comparator
     ) {
@@ -122,7 +123,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 .getFuture();
     }
 
-    private CompletableFuture<Void> setupOrdersAndHistory(SortedMap<String, Order> orders) {
+    private CompletableFuture<FutureStorage> setupOrdersAndHistory(SortedMap<String, Order> orders) {
         Comparator<String> csvStringHistoryComparator = Comparator
                 .comparing((String s) -> s.split(DELIMITER)[0])
                 .thenComparing((String s)-> Integer.parseInt(s.split(DELIMITER)[1]));
@@ -153,7 +154,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 .getFuture();
     }
 
-    private CompletableFuture<Void> setupProductsAndOrders(
+    private CompletableFuture<FutureStorage> setupProductsAndOrders(
             SortedMap<String, Order> orders,
             Comparator<String> comparator
     ) {
@@ -176,12 +177,12 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 .getFuture();
     }
 
-    private CompletableFuture<Void> setupUsersAndProducts() {
+    private CompletableFuture<FutureStorage> setupUsersAndProducts() {
 
         return completedFuture(null);
     }
 
-    private CompletableFuture<Void> setupProductsAndUsers() {
+    private CompletableFuture<FutureStorage> setupProductsAndUsers() {
         return completedFuture(null);
     }
 

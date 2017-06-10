@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public interface FutureStorage {
-    CompletableFuture<FutureStringStorage> getFuture();
+    CompletableFuture<FutureStorage> getFuture();
 
     CompletableFuture<String> get(int index);
 
