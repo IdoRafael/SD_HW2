@@ -3,10 +3,10 @@ package il.ac.technion.cs.sd.buy.library;
 
 import java.util.SortedMap;
 
-public interface StorageFactory {
-    Storage create(String fileName);
+public interface FutureStorageFactory {
+    FutureStorage create(String fileName);
 
-    Storage create(
+    FutureStorage create(
             String fileName,
             SortedMap<String, String> sortedMap
     );

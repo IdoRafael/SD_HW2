@@ -11,13 +11,13 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 
-public class StringStorage implements Storage {
+public class FutureStringStorage implements FutureStorage {
     private CompletableFuture<FutureLineStorage> futureLineStorage;
 
     private static final String DELIMITER = ",";
 
     @AssistedInject
-    public StringStorage(
+    public FutureStringStorage(
             FutureLineStorageFactory lineStorageFactory,
             @Assisted String fileName
     ) {
@@ -25,7 +25,7 @@ public class StringStorage implements Storage {
     }
 
     @AssistedInject
-    public StringStorage(
+    public FutureStringStorage(
             FutureLineStorageFactory lineStorageFactory,
             @Assisted String fileName,
             @Assisted SortedMap<String, String> sortedMap
@@ -39,6 +39,11 @@ public class StringStorage implements Storage {
                     .thenCompose(ls -> ls.appendLine(String.join(DELIMITER, entry.getKey(), entry.getValue())));
         }
         futureLineStorage = currentWrite.thenCompose(v -> futureLineStorage);
+    }
+
+    @Override
+    public CompletableFuture<Void> getFuture() {
+        return futureLineStorage.thenCompose(x -> completedFuture(null));
     }
 
     public CompletableFuture<String> get(int index) {
@@ -58,6 +63,18 @@ public class StringStorage implements Storage {
     @Override
     public CompletableFuture<Optional<String>> getStringByIds(String id0, String id1) {
         return findIndexByTwoKeys(id0, id1)
+                .thenCompose(indexFound -> {
+                    if (indexFound.isPresent()) {
+                        return get(indexFound.getAsInt()).thenApply(Optional::of);
+                    } else {
+                        return completedFuture(Optional.empty());
+                    }
+                });
+    }
+
+    @Override
+    public CompletableFuture<Optional<String>> getSomeStringBySingleId(String id0) {
+        return findIndexBySingleKey(id0)
                 .thenCompose(indexFound -> {
                     if (indexFound.isPresent()) {
                         return get(indexFound.getAsInt()).thenApply(Optional::of);
@@ -128,7 +145,8 @@ public class StringStorage implements Storage {
     }
 
     private CompletableFuture<OptionalInt> binarySearch(String target, Comparator comparator) {
-        return size()
+        return getFuture()
+                .thenCompose(x -> size())
                 .thenCompose(size -> binarySearchAux(0, size-1, target, comparator));
     }
 

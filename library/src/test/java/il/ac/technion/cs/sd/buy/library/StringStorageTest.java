@@ -5,9 +5,9 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -24,11 +24,11 @@ public class StringStorageTest  {
     @Rule
     public Timeout globalTimeout = Timeout.seconds(30);
 
-    static final Integer LINE_STORAGE_SIZE = 100;
+    private static final Integer LINE_STORAGE_SIZE = 100;
 
     //log2(size)+1 iterations + 1 for 2nd compare (to check if "equals")
-    static final int BINARY_SEARCH_ITERATIONS = (int)(Math.log(LINE_STORAGE_SIZE)/Math.log(2)) + 2;
-    final int AMOUNT_TO_RETURN = 10;
+    private static final int BINARY_SEARCH_ITERATIONS = (int)(Math.log(LINE_STORAGE_SIZE)/Math.log(2)) + 2;
+    private final int AMOUNT_TO_RETURN = 10;
 
     private static FutureLineStorageFactory setupLineStorageFactoryMock(final FutureLineStorage lineStorage) throws InterruptedException {
         final int SLEEP_DURATION = 100;
@@ -68,13 +68,13 @@ public class StringStorageTest  {
         };
     }
 
-    private static StringStorage setupStringStorage(final FutureLineStorage lineStorage) throws InterruptedException {
-        return new StringStorage(setupLineStorageFactoryMock(lineStorage), "");
+    private static FutureStringStorage setupStringStorage(final FutureLineStorage lineStorage) throws InterruptedException {
+        return new FutureStringStorage(setupLineStorageFactoryMock(lineStorage), "");
     }
 
     private void existTest(String id0, String id1, boolean exists) throws InterruptedException, ExecutionException {
         FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
-        StringStorage stringStorage = setupStringStorage(lineStorage);
+        FutureStringStorage stringStorage = setupStringStorage(lineStorage);
 
         assertEquals(exists, stringStorage.exists(id0, id1).get().booleanValue());
 
@@ -83,7 +83,7 @@ public class StringStorageTest  {
 
     private void getSingleStringsByIdTest(String id0, String id1) throws InterruptedException, ExecutionException {
         FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
-        StringStorage stringStorage = setupStringStorage(lineStorage);
+        FutureStringStorage stringStorage = setupStringStorage(lineStorage);
 
         CompletableFuture<Optional<String>> futureResult = stringStorage.getStringByIds(id0, id1);
         Optional<String> result = futureResult.get();
@@ -98,7 +98,7 @@ public class StringStorageTest  {
 
     private void getAllStringsByIdTest(String id) throws InterruptedException, ExecutionException {
         FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
-        StringStorage stringStorage = setupStringStorage(lineStorage);
+        FutureStringStorage stringStorage = setupStringStorage(lineStorage);
 
         CompletableFuture<List<String>> futureResult = stringStorage.getAllStringsById(id);
         List<String> resultList = futureResult.get();
@@ -110,9 +110,20 @@ public class StringStorageTest  {
         Mockito.verify(lineStorage, Mockito.atMost(BINARY_SEARCH_ITERATIONS + AMOUNT_TO_RETURN)).read(Mockito.anyInt());
     }
 
+    private void getSomeStringByIdTest(String id) throws InterruptedException, ExecutionException {
+        FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
+        FutureStringStorage stringStorage = setupStringStorage(lineStorage);
+
+        CompletableFuture<Optional<String>> futureResult = stringStorage.getSomeStringBySingleId(id);
+        Optional<String> result = futureResult.get();
+
+        assertEquals(id, result.get().split(",")[0]);
+        Mockito.verify(lineStorage, Mockito.atMost(BINARY_SEARCH_ITERATIONS)).read(Mockito.anyInt());
+    }
+
     private void missSingleStringsByIdTest(String id0, String id1) throws InterruptedException, ExecutionException {
         FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
-        StringStorage stringStorage = setupStringStorage(lineStorage);
+        FutureStringStorage stringStorage = setupStringStorage(lineStorage);
 
         CompletableFuture<Optional<String>> futureResult = stringStorage.getStringByIds(id0, id1);
         Optional<String> result = futureResult.get();
@@ -124,13 +135,24 @@ public class StringStorageTest  {
 
     private void missAllStringsByIdTest(String id) throws InterruptedException, ExecutionException {
         FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
-        StringStorage stringStorage = setupStringStorage(lineStorage);
+        FutureStringStorage stringStorage = setupStringStorage(lineStorage);
 
         CompletableFuture<List<String>> futureResult = stringStorage.getAllStringsById(id);
         List<String> resultList = futureResult.get();
 
         assertTrue(resultList.isEmpty());
         Mockito.verify(lineStorage, Mockito.atMost(BINARY_SEARCH_ITERATIONS + AMOUNT_TO_RETURN)).read(Mockito.anyInt());
+    }
+
+    private void missSomeStringsByIdTest(String id) throws InterruptedException, ExecutionException {
+        FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
+        FutureStringStorage stringStorage = setupStringStorage(lineStorage);
+
+        CompletableFuture<Optional<String>> futureResult = stringStorage.getSomeStringBySingleId(id);
+        Optional<String> result = futureResult.get();
+
+        assertTrue(!result.isPresent());
+        Mockito.verify(lineStorage, Mockito.atMost(BINARY_SEARCH_ITERATIONS)).read(Mockito.anyInt());
     }
 
     @Test
@@ -141,7 +163,7 @@ public class StringStorageTest  {
         IntStream.range(0, LINE_STORAGE_SIZE)
                 .forEach(i -> sortedMap.put("" + i, ""));
 
-        StringStorage stringStorage = new StringStorage(
+        FutureStringStorage stringStorage = new FutureStringStorage(
                 setupLineStorageFactoryMock(lineStorage),
                 "",
                 sortedMap
@@ -238,5 +260,35 @@ public class StringStorageTest  {
     @Test
     public void shouldMissGroupInEnd() throws InterruptedException, ExecutionException {
         missAllStringsByIdTest("999");
+    }
+
+    @Test
+    public void shouldFindSomeInStart() throws InterruptedException, ExecutionException {
+        getSomeStringByIdTest("0");
+    }
+
+    @Test
+    public void shouldFindSomeInMiddle() throws InterruptedException, ExecutionException {
+        getSomeStringByIdTest("5");
+    }
+
+    @Test
+    public void shouldFindSomeInEnd() throws InterruptedException, ExecutionException {
+        getSomeStringByIdTest("9");
+    }
+
+    @Test
+    public void shouldMissSomeStringInStart() throws InterruptedException, ExecutionException {
+        missSomeStringsByIdTest("");
+    }
+
+    @Test
+    public void shouldMissSomeStringInMiddle() throws InterruptedException, ExecutionException {
+        missSomeStringsByIdTest("50");
+    }
+
+    @Test
+    public void shouldMissSomeStringInEnd() throws InterruptedException, ExecutionException {
+        missSomeStringsByIdTest("999");
     }
 }
