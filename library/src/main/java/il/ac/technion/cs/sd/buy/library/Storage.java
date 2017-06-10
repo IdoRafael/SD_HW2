@@ -6,6 +6,10 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public interface Storage {
+    CompletableFuture<String> get(int index);
+
+    CompletableFuture<Integer> size();
+
     CompletableFuture<Boolean> exists(String id0, String id1);
 
     CompletableFuture<Optional<String>> getStringByIds(String id0, String id1);

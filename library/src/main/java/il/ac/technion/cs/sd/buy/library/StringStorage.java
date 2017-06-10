@@ -1,4 +1,3 @@
-/*
 package il.ac.technion.cs.sd.buy.library;
 
 import com.google.inject.assistedinject.Assisted;
@@ -6,14 +5,16 @@ import com.google.inject.assistedinject.AssistedInject;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
-public class StringStorage extends AbstractList<CompletableFuture<String>> implements RandomAccess, Storage {
+
+public class StringStorage implements Storage {
     private CompletableFuture<FutureLineStorage> futureLineStorage;
-    private boolean sizeIsValid = false;
-    private int size = 0;
 
     private static final String DELIMITER = ",";
 
@@ -23,116 +24,125 @@ public class StringStorage extends AbstractList<CompletableFuture<String>> imple
             @Assisted String fileName
     ) {
         this.futureLineStorage = lineStorageFactory.open(fileName);
-        sizeIsValid = false;
     }
 
     @AssistedInject
     public StringStorage(
             FutureLineStorageFactory lineStorageFactory,
-             @Assisted("fileName") String fileName,
-             @Assisted SortedMap<String, String> sortedMap
+            @Assisted String fileName,
+            @Assisted SortedMap<String, String> sortedMap
     ) {
         this(lineStorageFactory, fileName);
-        sortedMap.forEach(
-                (k, v) -> futureLineStorage.thenApply(
-                        futureLineStorage -> futureLineStorage.appendLine(String.join(DELIMITER, k,v))
-                )
-        );
-        sizeIsValid = false;
-    }
 
-    @Override
-    public String get(int index) {
-        try {
-            return futureLineStorage.read(index);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        CompletableFuture<Void> w = completedFuture(null);
+
+        for(Map.Entry<String,String> entry : sortedMap.entrySet()) {
+            w = w.thenCompose(x -> futureLineStorage)
+                    .thenCompose(ls -> ls.appendLine(String.join(DELIMITER, entry.getKey(), entry.getValue())));
         }
     }
 
-    @Override
-    public int size() {
-        try {
-            if (sizeIsValid) {
-                return size;
-            } else {
-                size = futureLineStorage.numberOfLines();
-                sizeIsValid = true;
-                return size;
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public CompletableFuture<String> get(int index) {
+        return futureLineStorage.thenCompose(ls -> ls.read(index));
+    }
+
+    public CompletableFuture<Integer> size() {
+        return futureLineStorage.thenCompose(ls -> ls.numberOfLines());
     }
 
     @Override
-    public boolean exists(String id0, String id1) {
-        return getStringByIds(id0, id1).isPresent();
+    public CompletableFuture<Boolean> exists(String id0, String id1) {
+        return getStringByIds(id0, id1)
+                .thenApply(Optional::isPresent);
     }
 
     @Override
-    public Optional<String> getStringByIds(String id0, String id1) {
-        int keyFound = findIndexByTwoKeys(id0, id1);
-        if (keyFound >= 0) {
-            return Optional.of(get(keyFound));
-        } else {
-            return Optional.empty();
-        }
+    public CompletableFuture<Optional<String>> getStringByIds(String id0, String id1) {
+        return findIndexByTwoKeys(id0, id1)
+                .thenCompose(indexFound -> {
+                    if (indexFound.isPresent()) {
+                        return get(indexFound.getAsInt()).thenApply(Optional::of);
+                    } else {
+                        return completedFuture(Optional.empty());
+                    }
+                });
     }
 
     @Override
-    public List<String> getAllStringsById(String id) {
-        int keyFound = findIndexBySingleKey(id);
-        LinkedList<String> sortedBySecondaryId = new LinkedList<>();
-        if (keyFound >= 0) {
-            for (int i = keyFound ; i >=0 ; --i) {
-                String toAdd = get(i);
-                if (toAdd.split(DELIMITER)[0].equals(id)) {
-                    sortedBySecondaryId.addFirst(toAdd);
-                } else {
-                    break;
-                }
-            }
-            for (int i = keyFound + 1 ; i < size() ; ++i) {
-                String toAdd = get(i);
-                if (toAdd.split(DELIMITER)[0].equals(id)) {
-                    sortedBySecondaryId.addLast(toAdd);
-                } else {
-                    break;
-                }
-            }
-            return sortedBySecondaryId;
-        } else {
-            return sortedBySecondaryId;
-        }
+    public CompletableFuture<List<String>> getAllStringsById(String id) {
+        /*LinkedList<String> sortedBySecondaryId = new LinkedList<>();
+
+        CompletableFuture<Void> w = completedFuture(null);
+        CompletableFuture<OptionalInt> futureIndex = findIndexBySingleKey(id);
+        allOf(futureIndex, size(), )
+
+
+        return findIndexBySingleKey(id)
+                .thenCompose(indexFound -> {
+                    if (indexFound.isPresent()) {
+                        for (int i = indexFound.getAsInt() ; i >=0 ; --i) {
+                            String toAdd = get(i);
+                            if (toAdd.split(DELIMITER)[0].equals(id)) {
+                                sortedBySecondaryId.addFirst(toAdd);
+                            } else {
+                                break;
+                            }
+                        }
+                        for (int i = indexFound.getAsInt() + 1 ; i < size() ; ++i) {
+                            String toAdd = get(i);
+                            if (toAdd.split(DELIMITER)[0].equals(id)) {
+                                sortedBySecondaryId.addLast(toAdd);
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    return completedFuture(sortedBySecondaryId);
+                });*/
+
+        return null;
     }
 
-    private int findIndexByTwoKeys(String key0, String key1) {
-        return findIndexByComparator(
+    private CompletableFuture<OptionalInt> findIndexByTwoKeys(String key0, String key1) {
+        return binarySearch(
                 String.join(DELIMITER, key0, key1),
                 Comparator.comparing((String s) -> s.split(DELIMITER)[0])
                         .thenComparing((String s)-> s.split(DELIMITER)[1])
         );
     }
 
-    private int findIndexBySingleKey(String key) {
-        return findIndexByComparator(
+    private CompletableFuture<OptionalInt> findIndexBySingleKey(String key) {
+        return binarySearch(
                 key,
                 Comparator.comparing((String s) -> s.split(DELIMITER)[0])
         );
 
     }
 
-    private int findIndexByComparator(String key, Comparator comparator) {
-        int keyFound;
+    private CompletableFuture<OptionalInt> binarySearch(String target, Comparator comparator) {
+        return size()
+                .thenCompose(size -> binarySearchAux(0, size-1, target, comparator));
+    }
 
-        try {
-            keyFound = Collections.binarySearch(this, key, comparator);
-        } catch (RuntimeException e) {
-            throw e;
+    private CompletableFuture<OptionalInt> binarySearchAux(int start, int end, String target, Comparator comparator) {
+        int middle = (start + end) / 2;
+        if(end < start) {
+            return completedFuture(OptionalInt.empty());
         }
 
-        return keyFound;
+        return get(middle)
+                .thenCompose( middleValue -> {
+                    int comparison = comparator.compare(target, middleValue);
+
+                    if(comparison == 0) {
+                        return completedFuture(OptionalInt.of(middle));
+                    } else if(comparison < 0) {
+                        return binarySearchAux(start, middle - 1, target, comparator);
+                    } else {
+                        return binarySearchAux(middle + 1, end, target, comparator);
+                    }
+                }
+        );
+
     }
 }
-*/
