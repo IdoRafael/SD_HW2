@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
 import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class BuyProductInitializerImpl implements BuyProductInitializer{
     private static final String DELIMITER = ",";
@@ -67,8 +68,8 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 setupOrdersAndProducts(orders, csvStringComparator),
                 setupOrdersAndHistory(orders),
                 setupProductsAndOrders(orders, csvStringComparator),
-                setupUsersAndProducts,
-                setupProductsAndUsers
+                setupUsersAndProducts(),
+                setupProductsAndUsers()
         );
     }
 
@@ -177,10 +178,11 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
 
     private CompletableFuture<Void> setupUsersAndProducts() {
 
+        return completedFuture(null);
     }
 
     private CompletableFuture<Void> setupProductsAndUsers() {
-
+        return completedFuture(null);
     }
 
     private String serializeBoolean(Boolean b) {
