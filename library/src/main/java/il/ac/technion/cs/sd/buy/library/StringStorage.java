@@ -33,10 +33,10 @@ public class StringStorage implements Storage {
     ) {
         this(lineStorageFactory, fileName);
 
-        CompletableFuture<Void> w = completedFuture(null);
+        CompletableFuture<Void> currentWrite = futureLineStorage.thenCompose(ls -> completedFuture(null));
 
         for(Map.Entry<String,String> entry : sortedMap.entrySet()) {
-            w = w.thenCompose(x -> futureLineStorage)
+            currentWrite = currentWrite.thenCompose(x -> futureLineStorage)
                     .thenCompose(ls -> ls.appendLine(String.join(DELIMITER, entry.getKey(), entry.getValue())));
         }
     }

@@ -3,6 +3,7 @@ package il.ac.technion.cs.sd.buy.library;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.*;
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 
 public class StringStorageTest  {
-    static final int LINE_STORAGE_SIZE = 100;
+    static final Integer LINE_STORAGE_SIZE = 100;
 
     //log2(size)+1 iterations + 1 for 2nd compare (to check if "equals")
     static final int BINARY_SEARCH_ITERATIONS = (int)(Math.log(LINE_STORAGE_SIZE)/Math.log(2)) + 2;
@@ -29,8 +30,10 @@ public class StringStorageTest  {
 
         Mockito.doAnswer(invocationOnMock -> {
             int i = (int)invocationOnMock.getArguments()[0];
-            return String.join(",", "" + i/10, "" + i%10, "" + i%10);
+            return completedFuture(String.join(",", "" + i/10, "" + i%10, "" + i%10));
         }).when(lineStorage).read(Mockito.anyInt());
+
+        Mockito.doAnswer(invocationOnMock -> completedFuture(null)).when(lineStorage).appendLine(Mockito.anyString());
 
         SortedMap<String, String> sortedMap = new TreeMap<>();
         IntStream.range(0, LINE_STORAGE_SIZE)
@@ -43,11 +46,11 @@ public class StringStorageTest  {
         return new StringStorage(setupLineStorageFactoryMock(lineStorage), "");
     }
 
-    private void existTest(String id0, String id1, boolean exists) throws InterruptedException {
+    private void existTest(String id0, String id1, boolean exists) throws InterruptedException, ExecutionException {
         FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
         StringStorage stringStorage = setupStringStorage(lineStorage);
 
-        assertEquals(exists, stringStorage.exists(id0, id1));
+        assertEquals(exists, stringStorage.exists(id0, id1).get().booleanValue());
 
         Mockito.verify(lineStorage, Mockito.atMost(BINARY_SEARCH_ITERATIONS)).read(Mockito.anyInt());
     }
@@ -106,62 +109,48 @@ public class StringStorageTest  {
 
     @Test
     public void shouldAppendRightAmountOfLines() throws Exception {
-//        FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
+        FutureLineStorage lineStorage = Mockito.mock(FutureLineStorage.class);
         SortedMap<String, String> sortedMap = new TreeMap<>();
-        sortedMap.put("a,a", "x");
-        sortedMap.put("b,a", "x");
-        sortedMap.put("b,b", "x");
-        sortedMap.put("b,c", "x");
-        sortedMap.put("c,c", "x");
 
-        /*StringStorage stringStorage = new StringStorage(
-                setupLineStorageFactoryMock(lineStorage),
-                "",
-                sortedMap
-        );*/
-
-        FutureLineStorageTestImpl fts = new FutureLineStorageTestImpl();
+        IntStream.range(0, LINE_STORAGE_SIZE)
+                .forEach(i -> sortedMap.put("" + i, ""));
 
         StringStorage stringStorage = new StringStorage(
-                s -> completedFuture(fts),
+                setupLineStorageFactoryMock(lineStorage),
                 "",
                 sortedMap
         );
 
-        assertEquals((Integer)5, stringStorage.size().get());
-        assertEquals("b,b,x", stringStorage.getStringByIds("b", "b").get().get());
-        System.out.println(stringStorage.getAllStringsById("b").get());
-
-//        Mockito.verify(lineStorage, Mockito.times(3)).appendLine(Mockito.anyString());
+        Mockito.verify(lineStorage, Mockito.times(LINE_STORAGE_SIZE)).appendLine(Mockito.anyString());
     }
 
     @Test
-    public void shouldExistInStart() throws InterruptedException {
+    public void shouldExistInStart() throws InterruptedException, ExecutionException {
         existTest("0", "0", true);
     }
 
     @Test
-    public void shouldExistInMiddle() throws InterruptedException {
+    public void shouldExistInMiddle() throws InterruptedException, ExecutionException {
         existTest("5" , "5", true);
     }
 
     @Test
-    public void shouldExistInEnd() throws InterruptedException {
+    public void shouldExistInEnd() throws InterruptedException, ExecutionException {
         existTest("9", "9", true);
     }
 
     @Test
-    public void shouldntExistInStart() throws InterruptedException {
+    public void shouldntExistInStart() throws InterruptedException, ExecutionException {
         existTest("", "0", false);
     }
 
     @Test
-    public void shouldntExistInMiddle() throws InterruptedException {
+    public void shouldntExistInMiddle() throws InterruptedException, ExecutionException {
         existTest("50" , "5", false);
     }
 
     @Test
-    public void shouldntExistInEnd() throws InterruptedException {
+    public void shouldntExistInEnd() throws InterruptedException, ExecutionException {
         existTest("9", "999", false);
     }
 
