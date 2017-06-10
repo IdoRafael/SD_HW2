@@ -13,24 +13,32 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class FutureStringStorage implements FutureStorage {
     private CompletableFuture<FutureLineStorage> futureLineStorage;
+    private Comparator<String> firstIdComparator;
+    private Comparator<String> secondaryIdComparator;
 
     private static final String DELIMITER = ",";
 
     @AssistedInject
     public FutureStringStorage(
             FutureLineStorageFactory lineStorageFactory,
+            Comparator<String> firstIdComparator,
+            Comparator<String> secondaryIdComparator,
             @Assisted String fileName
     ) {
         this.futureLineStorage = lineStorageFactory.open(fileName);
+        this.firstIdComparator = firstIdComparator;
+        this.secondaryIdComparator = secondaryIdComparator;
     }
 
     @AssistedInject
     public FutureStringStorage(
             FutureLineStorageFactory lineStorageFactory,
+            Comparator<String> firstIdComparator,
+            Comparator<String> secondaryIdComparator,
             @Assisted String fileName,
             @Assisted SortedMap<String, String> sortedMap
     ) {
-        this(lineStorageFactory, fileName);
+        this(lineStorageFactory,firstIdComparator, secondaryIdComparator, fileName);
 
         CompletableFuture<Void> currentWrite = futureLineStorage.thenCompose(ls -> completedFuture(null));
 
@@ -131,26 +139,26 @@ public class FutureStringStorage implements FutureStorage {
     private CompletableFuture<OptionalInt> findIndexByTwoKeys(String key0, String key1) {
         return binarySearch(
                 String.join(DELIMITER, key0, key1),
-                Comparator.comparing((String s) -> s.split(DELIMITER)[0])
-                        .thenComparing((String s)-> s.split(DELIMITER)[1])
+                Comparator.comparing((String s) -> s.split(DELIMITER)[0], firstIdComparator)
+                        .thenComparing((String s)-> s.split(DELIMITER)[1], secondaryIdComparator)
         );
     }
 
     private CompletableFuture<OptionalInt> findIndexBySingleKey(String key) {
         return binarySearch(
                 key,
-                Comparator.comparing((String s) -> s.split(DELIMITER)[0])
+                Comparator.comparing((String s) -> s.split(DELIMITER)[0], firstIdComparator)
         );
 
     }
 
-    private CompletableFuture<OptionalInt> binarySearch(String target, Comparator comparator) {
+    private CompletableFuture<OptionalInt> binarySearch(String target, Comparator<String> comparator) {
         return getFuture()
                 .thenCompose(x -> size())
                 .thenCompose(size -> binarySearchAux(0, size-1, target, comparator));
     }
 
-    private CompletableFuture<OptionalInt> binarySearchAux(int start, int end, String target, Comparator comparator) {
+    private CompletableFuture<OptionalInt> binarySearchAux(int start, int end, String target, Comparator<String> comparator) {
         int middle = (start + end) / 2;
         if(end < start) {
             return completedFuture(OptionalInt.empty());

@@ -71,20 +71,15 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                         )
                 )
         );
-        CompletableFuture<Void> task0 = futureStorageFactory.create(usersAndOrdersFileName, usersAndOrders).getFuture();
+        CompletableFuture<Void> task0 = futureStorageFactory.create(
+                usersAndOrdersFileName,
+                String::compareTo,
+                String::compareTo,
+                usersAndOrders
+        )
+                .getFuture();
 
         //ordersAndProductsFileName
-        /*SortedMap<String, String> ordersAndProducts = new TreeMap<>(csvStringComparator);
-        orders.forEach(
-                (k, order) -> ordersAndProducts.put(
-                        String.join(DELIMITER, order.getOrderId(), order.getProductId()),
-                        String.join(DELIMITER,
-                                order.getLatestAmount().toString(),
-                                serializeBoolean(order.isCancelled()),
-                                serializeBoolean(order.isModified())
-                        )
-                )
-        );*/
         //CompletableFuture<Void> task1 = futureStorageFactory.create(filename, map).getFuture();
 
         //ordersAndHistoryFileName

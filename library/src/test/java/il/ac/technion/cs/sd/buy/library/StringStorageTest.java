@@ -69,7 +69,12 @@ public class StringStorageTest  {
     }
 
     private static FutureStringStorage setupStringStorage(final FutureLineStorage lineStorage) throws InterruptedException {
-        return new FutureStringStorage(setupLineStorageFactoryMock(lineStorage), "");
+        return new FutureStringStorage(
+                setupLineStorageFactoryMock(lineStorage),
+                String::compareTo,
+                String::compareTo,
+                ""
+        );
     }
 
     private void existTest(String id0, String id1, boolean exists) throws InterruptedException, ExecutionException {
@@ -165,6 +170,8 @@ public class StringStorageTest  {
 
         FutureStringStorage stringStorage = new FutureStringStorage(
                 setupLineStorageFactoryMock(lineStorage),
+                String::compareTo,
+                String::compareTo,
                 "",
                 sortedMap
         );
