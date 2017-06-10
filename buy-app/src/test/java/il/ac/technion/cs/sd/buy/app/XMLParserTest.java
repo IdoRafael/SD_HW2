@@ -1,6 +1,5 @@
-package il.ac.technion.cs.sd.buy.test;
+package il.ac.technion.cs.sd.buy.app;
 
-import il.ac.technion.cs.sd.buy.app.XMLParser;
 import org.junit.Test;
 
 import java.io.File;
@@ -10,7 +9,11 @@ import java.util.Scanner;
 /**
  * Created by Yaniv on 09/06/2017.
  */
-public class XMLParserTest extends SdHw2Test {
+public class XMLParserTest {
+
+    public static String getFilesContent(String fileName) throws FileNotFoundException {
+        return new Scanner(new File(XMLParserTest.class.getResource(fileName).getFile())).useDelimiter("\\Z").next();
+    }
 
     public void justRun(String fileName)throws FileNotFoundException {
         String xml = getFilesContent(fileName);
