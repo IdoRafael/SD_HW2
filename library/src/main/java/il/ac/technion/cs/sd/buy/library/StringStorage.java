@@ -72,7 +72,7 @@ public class StringStorage implements Storage {
         return findIndexBySingleKey(id).thenCompose(indexFound -> {
             if (indexFound.isPresent()) {
                 CompletableFuture<LinkedList<String>> before = getAllBeforeWithSameKey(indexFound.getAsInt(), id);
-                CompletableFuture<LinkedList<String>> after = getAllAfterWithSameKey(indexFound.getAsInt(), id);
+                CompletableFuture<LinkedList<String>> after = getAllAfterWithSameKey(indexFound.getAsInt() + 1, id);
                 return before.thenCombine(after, (beforeList, afterList) -> {
                     beforeList.addAll(afterList);
                     return beforeList;
