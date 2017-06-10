@@ -68,7 +68,7 @@ public class XMLParser extends Parser{
         String userId = ((Element) node).getElementsByTagName("user-id").item(0).getTextContent();
         String orderId = ((Element) node).getElementsByTagName("order-id").item(0).getTextContent();
         String amount = ((Element) node).getElementsByTagName("amount").item(0).getTextContent();
-        orders.put(orderId, new Order(orderId, userId, productId, Integer.parseInt(amount)));
+        orders.put(orderId, new Order(orderId, userId, productId, Integer.parseInt(amount), Integer.parseInt(products.get(productId))));
     }
 
     private void modifyOrder(Node node){

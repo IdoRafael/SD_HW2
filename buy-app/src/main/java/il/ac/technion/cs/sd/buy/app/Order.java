@@ -7,15 +7,17 @@ public class Order{
     private String orderId;
     private String userId;
     private String productId;
+    private Integer productPrice;
     private Integer latestAmount;
     private boolean isCancelled;
     private List<Integer> amountHistory;
 
-    public Order(String orderId, String userId, String productId, Integer initialAmount) {
+    public Order(String orderId, String userId, String productId, Integer initialAmount, Integer productPrice) {
         this.orderId = orderId;
         this.userId = userId;
         this.productId = productId;
         this.latestAmount = initialAmount;
+        this.productPrice = productPrice;
 
         this.isCancelled = false;
         amountHistory = new ArrayList<>();

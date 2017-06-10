@@ -56,7 +56,7 @@ public class JSONParser extends Parser{
         String userId = jsonObject.get("user-id").getAsString();
         String orderId = jsonObject.get("order-id").getAsString();
         int amount = jsonObject.get("amount").getAsInt();
-        orders.put(orderId, new Order(orderId, userId, productId, amount));
+        orders.put(orderId, new Order(orderId, userId, productId, amount, Integer.parseInt(products.get(productId))));
     }
 
     private void modifyOrder(JsonObject jsonObject){
