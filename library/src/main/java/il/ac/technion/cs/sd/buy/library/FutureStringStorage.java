@@ -50,8 +50,8 @@ public class FutureStringStorage implements FutureStorage {
     }
 
     @Override
-    public CompletableFuture<Void> getFuture() {
-        return futureLineStorage.thenCompose(x -> completedFuture(null));
+    public CompletableFuture<FutureStringStorage> getFuture() {
+        return futureLineStorage.thenCompose(x -> completedFuture(this));
     }
 
     public CompletableFuture<String> get(int index) {
