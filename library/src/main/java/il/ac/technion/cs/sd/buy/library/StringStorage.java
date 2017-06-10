@@ -5,7 +5,6 @@ import com.google.inject.assistedinject.AssistedInject;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -70,37 +69,46 @@ public class StringStorage implements Storage {
 
     @Override
     public CompletableFuture<List<String>> getAllStringsById(String id) {
-        /*LinkedList<String> sortedBySecondaryId = new LinkedList<>();
+        return findIndexBySingleKey(id).thenCompose(indexFound -> {
+            if (indexFound.isPresent()) {
+                CompletableFuture<LinkedList<String>> before = getAllBeforeWithSameKey(indexFound.getAsInt(), id);
+                CompletableFuture<LinkedList<String>> after = getAllAfterWithSameKey(indexFound.getAsInt(), id);
+                return before.thenCombine(after, (beforeList, afterList) -> {
+                    beforeList.addAll(afterList);
+                    return beforeList;
+                });
+            }
+            return completedFuture(new LinkedList<>());
+        });
+    }
 
-        CompletableFuture<Void> w = completedFuture(null);
-        CompletableFuture<OptionalInt> futureIndex = findIndexBySingleKey(id);
-        allOf(futureIndex, size(), )
+    private CompletableFuture<LinkedList<String>> getAllBeforeWithSameKey(int i, String key) {
+        if (i < 0) {
+            return completedFuture(new LinkedList<>());
+        }
+        return get(i).thenCompose(found -> {
+            if (found.split(DELIMITER)[0].equals(key)) {
+                return getAllBeforeWithSameKey(i-1, key).thenApply(list -> {list.addLast(found); return list;});
+            } else {
+                return completedFuture(new LinkedList<>());
+            }
+        });
+    }
 
-
-        return findIndexBySingleKey(id)
-                .thenCompose(indexFound -> {
-                    if (indexFound.isPresent()) {
-                        for (int i = indexFound.getAsInt() ; i >=0 ; --i) {
-                            String toAdd = get(i);
-                            if (toAdd.split(DELIMITER)[0].equals(id)) {
-                                sortedBySecondaryId.addFirst(toAdd);
-                            } else {
-                                break;
-                            }
-                        }
-                        for (int i = indexFound.getAsInt() + 1 ; i < size() ; ++i) {
-                            String toAdd = get(i);
-                            if (toAdd.split(DELIMITER)[0].equals(id)) {
-                                sortedBySecondaryId.addLast(toAdd);
-                            } else {
-                                break;
-                            }
-                        }
+    private CompletableFuture<LinkedList<String>> getAllAfterWithSameKey(int i, String key) {
+        return size().thenCompose(size -> {
+            if (i >= size) {
+                return completedFuture(new LinkedList<>());
+            } else {
+                return get(i).thenCompose(found -> {
+                    if (found.split(DELIMITER)[0].equals(key)) {
+                        return getAllAfterWithSameKey(i+1, key).thenApply(list -> {list.addFirst(found); return list;});
+                    } else {
+                        return completedFuture(new LinkedList<>());
                     }
-                    return completedFuture(sortedBySecondaryId);
-                });*/
-
-        return null;
+                });
+            }
+        });
     }
 
     private CompletableFuture<OptionalInt> findIndexByTwoKeys(String key0, String key1) {
