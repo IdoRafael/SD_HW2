@@ -32,5 +32,4 @@ public abstract class Parser {
             System.out.println("cancelled: " + entry.getValue().isCancelled());
         }
     }
-
 }
