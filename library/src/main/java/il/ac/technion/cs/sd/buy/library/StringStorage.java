@@ -38,6 +38,7 @@ public class StringStorage implements Storage {
             currentWrite = currentWrite.thenCompose(x -> futureLineStorage)
                     .thenCompose(ls -> ls.appendLine(String.join(DELIMITER, entry.getKey(), entry.getValue())));
         }
+        futureLineStorage = currentWrite.thenCompose(v -> futureLineStorage);
     }
 
     public CompletableFuture<String> get(int index) {

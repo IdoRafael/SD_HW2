@@ -2,7 +2,9 @@ package il.ac.technion.cs.sd.buy.library;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -19,6 +21,9 @@ import static org.junit.Assert.assertTrue;
 
 
 public class StringStorageTest  {
+    @Rule
+    public Timeout globalTimeout = Timeout.seconds(30);
+
     static final Integer LINE_STORAGE_SIZE = 100;
 
     //log2(size)+1 iterations + 1 for 2nd compare (to check if "equals")

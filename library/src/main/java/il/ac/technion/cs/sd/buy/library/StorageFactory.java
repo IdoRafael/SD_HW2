@@ -1,8 +1,6 @@
 package il.ac.technion.cs.sd.buy.library;
 
 
-import com.google.inject.assistedinject.Assisted;
-
 import java.util.SortedMap;
 
 public interface StorageFactory {
