@@ -8,20 +8,9 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
-public class XMLParser {
-    private SortedMap<String, String> products = new TreeMap<>();
-    private SortedMap<String, Order> orders = new TreeMap<>();
-
+public class XMLParser extends Parser{
     public XMLParser(String xml) {
         Document document;
         try {
@@ -35,14 +24,6 @@ public class XMLParser {
 
         parseProducts(document);
         parseOrders(document);
-    }
-
-    public SortedMap<String, String> getProducts() {
-        return products;
-    }
-
-    public SortedMap<String, Order> getOrders() {
-        return orders;
     }
 
     private void parseProducts(Document document) {
@@ -108,22 +89,5 @@ public class XMLParser {
             return;
         }
         orders.get(orderId).setCancelled(true);
-    }
-
-    public void print() {
-        System.out.println("Products");
-        for (Map.Entry<String,String> entry : products.entrySet()){
-            System.out.println(entry.getKey() + " " + entry.getValue());
-        }
-        System.out.println("Orders");
-        for (Map.Entry<String,Order> entry : orders.entrySet()){
-            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
-                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
-            System.out.print("amount history: ");
-            for(Integer amount : entry.getValue().getAmountHistory()){
-                System.out.print(amount + " ");
-            }
-            System.out.println("cancelled: " + entry.getValue().isCancelled());
-        }
     }
 }

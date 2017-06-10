@@ -6,16 +6,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Created by Yaniv on 09/06/2017.
  */
-public class JSONParser {
-    private SortedMap<String, String> products = new TreeMap<>();
-    private SortedMap<String, Order> orders = new TreeMap<>();
+public class JSONParser extends Parser{
 
     public JSONParser(String json){
         JsonElement jsonElement = new JsonParser().parse(json);
@@ -23,14 +18,6 @@ public class JSONParser {
 
         parseProducts(jsonArray);
         parseOrders(jsonArray);
-    }
-
-    public SortedMap<String, String> getProducts() {
-        return products;
-    }
-
-    public SortedMap<String, Order> getOrders() {
-        return orders;
     }
 
     private void parseProducts(JsonArray jsonArray){
@@ -89,22 +76,5 @@ public class JSONParser {
             return;
         }
         orders.get(orderId).setCancelled(true);
-    }
-
-    public void print() {
-        System.out.println("Products");
-        for (Map.Entry<String,String> entry : products.entrySet()){
-            System.out.println(entry.getKey() + " " + entry.getValue());
-        }
-        System.out.println("Orders");
-        for (Map.Entry<String,Order> entry : orders.entrySet()){
-            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
-                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
-            System.out.print("amount history: ");
-            for(Integer amount : entry.getValue().getAmountHistory()){
-                System.out.print(amount + " ");
-            }
-            System.out.println("cancelled: " + entry.getValue().isCancelled());
-        }
     }
 }
