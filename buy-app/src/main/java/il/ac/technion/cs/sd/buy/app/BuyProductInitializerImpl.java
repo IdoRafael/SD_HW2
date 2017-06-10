@@ -5,9 +5,11 @@ import il.ac.technion.cs.sd.buy.library.FutureStorageFactory;
 
 import javax.inject.Named;
 import java.util.Comparator;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 
 import static java.util.concurrent.CompletableFuture.allOf;
 
@@ -59,8 +61,22 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                 .comparing((String s) -> s.split(DELIMITER)[0])
                 .thenComparing((String s)-> s.split(DELIMITER)[1]);
 
-        //usersAndOrdersFileName
-        SortedMap<String, String> usersAndOrders = new TreeMap<>(csvStringComparator);
+
+        return allOf(
+                setupUsersAndOrders(orders, csvStringComparator),
+                setupOrdersAndProducts(orders, csvStringComparator),
+                setupOrdersAndHistory(orders),
+                setupProductsAndOrders(orders, csvStringComparator),
+                setupUsersAndProducts,
+                setupProductsAndUsers
+        );
+    }
+
+    private CompletableFuture<Void> setupUsersAndOrders(
+            SortedMap<String, Order> orders,
+            Comparator<String> comparator
+    ) {
+        SortedMap<String, String> usersAndOrders = new TreeMap<>(comparator);
         orders.forEach(
                 (k, order) -> usersAndOrders.put(
                         String.join(DELIMITER, order.getUserId(), order.getOrderId()),
@@ -71,7 +87,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                         )
                 )
         );
-        CompletableFuture<Void> task0 = futureStorageFactory.create(
+        return futureStorageFactory.create(
                 usersAndOrdersFileName,
                 String::compareTo,
                 String::compareTo,
@@ -79,25 +95,92 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
         )
                 .getFuture();
 
-        //ordersAndProductsFileName
-        //CompletableFuture<Void> task1 = futureStorageFactory.create(filename, map).getFuture();
+    }
 
-        //ordersAndHistoryFileName
-        //CompletableFuture<Void> task2 = futureStorageFactory.create(filename, map).getFuture();
+    private CompletableFuture<Void> setupOrdersAndProducts(
+            SortedMap<String, Order> orders,
+            Comparator<String> comparator
+    ) {
+        SortedMap<String, String> ordersAndProducts = new TreeMap<>(comparator);
+        orders.forEach(
+                (k, order) -> ordersAndProducts.put(
+                        String.join(DELIMITER, order.getOrderId(), order.getProductId()),
+                        String.join(DELIMITER,
+                                order.getLatestAmount().toString(),
+                                serializeBoolean(order.isCancelled()),
+                                serializeBoolean(order.isModified())
+                        )
+                )
+        );
+        return futureStorageFactory.create(
+                ordersAndProductsFileName,
+                String::compareTo,
+                String::compareTo,
+                ordersAndProducts
+        )
+                .getFuture();
+    }
 
-        //productsAndOrdersFileName
-        //CompletableFuture<Void> task3 = futureStorageFactory.create(filename, map).getFuture();
+    private CompletableFuture<Void> setupOrdersAndHistory(SortedMap<String, Order> orders) {
+        Comparator<String> csvStringHistoryComparator = Comparator
+                .comparing((String s) -> s.split(DELIMITER)[0])
+                .thenComparing((String s)-> Integer.parseInt(s.split(DELIMITER)[1]));
 
-        //usersAndProductsFileName
-        //CompletableFuture<Void> task4 = futureStorageFactory.create(filename, map).getFuture();
+        SortedMap<String, String> ordersAndHistory = new TreeMap<>(csvStringHistoryComparator);
+        orders.forEach(
+                (k, order) -> {
+                    List<Integer> amountHistory = order.getAmountHistory();
+                    IntStream
+                            .range(0, amountHistory.size())
+                            .forEach(
+                                    i -> ordersAndHistory.put(
+                                            String.join(
+                                                    DELIMITER,order.getOrderId(),
+                                                    ((Integer)i).toString()
+                                            ),
+                                            amountHistory.get(i).toString()
+                                    )
+                            );
+                }
+        );
+        return futureStorageFactory.create(
+                ordersAndHistoryFileName,
+                String::compareTo,
+                Comparator.comparing(Integer::parseInt),
+                ordersAndHistory
+        )
+                .getFuture();
+    }
 
-        //productsAndUsersFileName
-        //CompletableFuture<Void> task5 = futureStorageFactory.create(filename, map).getFuture();
+    private CompletableFuture<Void> setupProductsAndOrders(
+            SortedMap<String, Order> orders,
+            Comparator<String> comparator
+    ) {
+        SortedMap<String, String> productsAndOrders = new TreeMap<>(comparator);
+        orders.forEach(
+                (k, order) -> productsAndOrders.put(
+                        String.join(DELIMITER, order.getProductId(), order.getOrderId()),
+                        String.join(DELIMITER,
+                                order.getLatestAmount().toString(),
+                                serializeBoolean(order.isCancelled())
+                        )
+                )
+        );
+        return futureStorageFactory.create(
+                productsAndOrdersFileName,
+                String::compareTo,
+                String::compareTo,
+                productsAndOrders
+        )
+                .getFuture();
+    }
 
-//        return allOf(task0, task1, task2, task3, task4, task5);
+    private CompletableFuture<Void> setupUsersAndProducts() {
 
-        //TODO TEMP
-        return null;
+    }
+
+    private CompletableFuture<Void> setupProductsAndUsers() {
+
     }
 
     private String serializeBoolean(Boolean b) {

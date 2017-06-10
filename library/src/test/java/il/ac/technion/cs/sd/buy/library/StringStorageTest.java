@@ -44,7 +44,7 @@ public class StringStorageTest  {
 
         Mockito.doAnswer(invocationOnMock -> {
             try {
-                Thread.sleep(SLEEP_DURATION / 2);
+                Thread.sleep(SLEEP_DURATION);
             } catch (InterruptedException e) {
 
             }
