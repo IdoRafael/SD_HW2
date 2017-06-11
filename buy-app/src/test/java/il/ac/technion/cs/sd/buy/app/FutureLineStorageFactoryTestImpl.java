@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class FutureLineStorageFactoryTestImpl implements FutureLineStorageFactory {
-    private static final int SLEEP_DURATION = 700;
+    private static final int SLEEP_DURATION = 100;
 
     private HashMap<String, CompletableFuture<FutureLineStorage>>
             openLineStorages = new HashMap<>();
@@ -21,11 +21,11 @@ public class FutureLineStorageFactoryTestImpl implements FutureLineStorageFactor
         );
 
         //TODO ADD SLEEP WHEN DONE WRITING TESTS
-        /*try {
-            Thread.sleep(SLEEP_DURATION);
+        try {
+            Thread.sleep(openLineStorages.size() * SLEEP_DURATION);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
         return openLineStorages.get(s);
     }
 }

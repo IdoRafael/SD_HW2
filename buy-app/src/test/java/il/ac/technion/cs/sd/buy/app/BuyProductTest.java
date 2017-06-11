@@ -221,22 +221,22 @@ public class BuyProductTest {
             reader -> reader.getTotalNumberOfItemsPurchased("ps4")
     ).get().getAsLong());
 
-    assertEquals(0, Double.compare(2, futureReader.thenCompose(
+    assertEquals(2.0, futureReader.thenCompose(
             reader -> reader.getAverageNumberOfItemsPurchased("snes")
-    ).get().orElseThrow(RuntimeException::new)));
+    ).get().orElseThrow(RuntimeException::new), 0.00001);
   }
 
   @Test
   public void reorderingShouldReset3() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
 
-    assertEquals(0, Double.compare(0, futureReader.thenCompose(
+    assertEquals(0, futureReader.thenCompose(
             reader -> reader.getCancelRatioForUser("geek")
-    ).get().orElseThrow(RuntimeException::new)));
+    ).get().orElseThrow(RuntimeException::new), 0.00001);
 
-    assertEquals(0, Double.compare(0.5, futureReader.thenCompose(
+    assertEquals(0.5, futureReader.thenCompose(
             reader -> reader.getModifyRatioForUser("geek")
-    ).get().orElseThrow(RuntimeException::new)));
+    ).get().orElseThrow(RuntimeException::new), 0.00001);
 
     CompletableFuture<Map<String, Long>> allItemsPurchased = futureReader.thenCompose(
             reader -> reader.getAllItemsPurchased("geek")
@@ -270,13 +270,13 @@ public class BuyProductTest {
             reader1 -> reader1.getOrderIdsThatPurchased("turbografx")
     ).get().contains("10"));
 
-    assertEquals(0, Double.compare(0.0,  futureReader.thenCompose(
+    assertEquals(0.0,  futureReader.thenCompose(
             reader -> reader.getCancelRatioForUser("nerd")
-    ).get().orElseThrow(RuntimeException::new)));
+    ).get().orElseThrow(RuntimeException::new), 0.00001);
 
-    assertEquals(0, Double.compare((0.5),  futureReader.thenCompose(
+    assertEquals(0.5,  futureReader.thenCompose(
             reader -> reader.getCancelRatioForUser("noob")
-    ).get().orElseThrow(RuntimeException::new)));
+    ).get().orElseThrow(RuntimeException::new), 0.00001);
 
   }
 
@@ -417,6 +417,7 @@ public class BuyProductTest {
     );
 
   }
+
   @Test
   public void numbersOfItemsPurchased() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
@@ -451,20 +452,16 @@ public class BuyProductTest {
   }
 
   @Test
-    public void modifiedOrderedThatWhereCanceledShouldCountForRatio() throws Exception{
+  public void modifiedOrderedThatWhereCanceledShouldCountForRatio() throws Exception{
       CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
-      assertEquals(0, Double.compare((1.0), futureReader.thenCompose(
+      assertEquals(1.0, futureReader.thenCompose(
               reader -> reader.getModifyRatioForUser("noob")
-      ).get().orElseThrow(RuntimeException::new)));
+      ).get().orElseThrow(RuntimeException::new), 0.00001);
 
-      System.out.println(futureReader.thenCompose(
-              reader -> reader.getModifyRatioForUser("poke")
-      ).get());
-
-      assertEquals(0, Double.compare((2/3), futureReader.thenCompose(
-              reader -> reader.getModifyRatioForUser("poke")
-      ).get().orElseThrow(RuntimeException::new)));
+      assertEquals(2.0/3.0, futureReader.thenCompose(
+                      reader -> reader.getModifyRatioForUser("poke")
+              ).get().orElseThrow(RuntimeException::new), 0.00001);
   }
 
 }
