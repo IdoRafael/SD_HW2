@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.SortedMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -61,5 +62,6 @@ public class XMLParserTest {
         assertEquals(orders.get("8").getUserId(),"nerd");
         assertEquals(orders.get("7").getProductId(),"gameboy");
         assertEquals(orders.get("10").getAmountHistory().size(),7);
+        assertFalse(orders.containsKey("thisOrderWillBeCanceled"));
     }
 }

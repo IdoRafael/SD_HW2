@@ -138,4 +138,16 @@
     <id>ps4</id>
     <price>1200</price>
   </Product>
+  <Order>
+    <user-id>noob</user-id>
+    <order-id>thisOrderWillBeCanceled</order-id>
+    <product-id>ps4</product-id>
+    <amount>1</amount>
+  </Order>
+  <Order>
+    <user-id>noob2</user-id>
+    <order-id>thisOrderWillBeCanceled</order-id>
+    <product-id>xbox720</product-id>
+    <amount>1</amount>
+  </Order>
 </Root>
