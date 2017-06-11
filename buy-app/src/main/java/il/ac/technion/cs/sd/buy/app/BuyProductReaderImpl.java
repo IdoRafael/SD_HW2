@@ -8,6 +8,7 @@ import il.ac.technion.cs.sd.buy.library.FutureStorageFactory;
 import javax.inject.Named;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static java.util.concurrent.CompletableFuture.allOf;
 
@@ -121,22 +122,24 @@ public class BuyProductReaderImpl implements BuyProductReader {
     public CompletableFuture<List<Integer>> getHistoryOfOrder(String orderId) {
         return ordersAndHistory
                 .thenCompose(futureStorage -> futureStorage.getAllStringsById(orderId))
-                .thenApply(list -> {
-                    List<Integer> historyList = new ArrayList<>(list.size());
-                    list.forEach(s -> historyList.add(Integer.parseInt(removeKey(s))));
-                    return historyList;
-                });
+                .thenApply(
+                        list -> list
+                                .stream()
+                                .map(s -> Integer.parseInt(removeKey(s)))
+                                .collect(Collectors.toList())
+                );
     }
 
     @Override
     public CompletableFuture<List<String>> getOrderIdsForUser(String userId) {
         return usersAndOrders
                 .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
-                .thenApply(list -> {
-                    List<String> ordersList = new ArrayList<>(list.size());
-                    list.forEach(s -> ordersList.add(new Order(removeKey(s)).getOrderId()));
-                    return ordersList;
-                });
+                .thenApply(
+                        list -> list
+                                .stream()
+                                .map(s -> new Order(removeKey(s)).getOrderId())
+                                .collect(Collectors.toList())
+                );
     }
 
     @Override
@@ -155,17 +158,36 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
     @Override
     public CompletableFuture<List<String>> getUsersThatPurchased(String productId) {
-        return null;
+        return productsAndUsers
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(productId))
+                .thenApply(
+                        list -> list
+                                .stream()
+                                .map(s -> new Order(removeKey(s)).getUserId())
+                                .collect(Collectors.toList())
+                );
     }
 
     @Override
     public CompletableFuture<List<String>> getOrderIdsThatPurchased(String productId) {
-        return null;
+        return productsAndOrders
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(productId))
+                .thenApply(
+                        list -> list
+                                .stream()
+                                .map(s -> new Order(removeKey(s)).getOrderId())
+                                .collect(Collectors.toList())
+                );
     }
 
     @Override
     public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String productId) {
-        return null;
+        //TODO NOT SDONE LOLZSW
+        return productsAndUsers
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(productId))
+                .thenApply(list -> {
+                    return OptionalLong.empty();
+                });
     }
 
     @Override

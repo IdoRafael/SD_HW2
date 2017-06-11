@@ -126,12 +126,23 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
                             .forEach(
                                     i -> ordersAndHistory.put(
                                             String.join(
-                                                    DELIMITER,order.getOrderId(),
+                                                    DELIMITER,
+                                                    order.getOrderId(),
                                                     ((Integer)i).toString()
                                             ),
                                             amountHistory.get(i).toString()
                                     )
                             );
+                    if (order.isCancelled()) {
+                        ordersAndHistory.put(
+                                String.join(
+                                        DELIMITER,
+                                        order.getOrderId(),
+                                        ((Integer)amountHistory.size()).toString()
+                                ),
+                                "-1"
+                        );
+                    }
                 }
         );
         return futureStorageFactory.create(
