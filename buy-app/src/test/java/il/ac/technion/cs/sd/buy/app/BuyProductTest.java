@@ -423,52 +423,6 @@ public class BuyProductTest {
     CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
     assertEquals(OptionalLong.empty(), futureReader.thenCompose(
-              reader -> reader.getTotalNumberOfItemsPurchased("cat")).get()
-    );
-
-    assertEquals(0, futureReader.thenCompose(
-              reader -> reader.getTotalNumberOfItemsPurchased("gamecom")).get().getAsLong()
-    );
-
-    assertEquals(30, futureReader.thenCompose(
-              reader -> reader.getTotalNumberOfItemsPurchased("megadrive")).get().getAsLong()
-    );
-
-    assertEquals(2, futureReader.thenCompose(
-          reader -> reader.getTotalNumberOfItemsPurchased("gameboy")).get().getAsLong()
-    );
-
-    assertEquals(1, futureReader.thenCompose(
-          reader -> reader.getTotalNumberOfItemsPurchased("ps4")).get().getAsLong()
-    );
-
-    assertEquals(4, futureReader.thenCompose(
-          reader -> reader.getTotalNumberOfItemsPurchased("vectrex")).get().getAsLong()
-    );
-
-    assertEquals(7, futureReader.thenCompose(
-          reader -> reader.getTotalNumberOfItemsPurchased("turbografx")).get().getAsLong()
-    );
-  }
-
-  @Test
-  public void modifiedOrderedThatWhereCanceledShouldCountForRatio() throws Exception{
-      CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
-
-      assertEquals(1.0, futureReader.thenCompose(
-              reader -> reader.getModifyRatioForUser("noob")
-      ).get().orElseThrow(RuntimeException::new), 0.00001);
-
-      assertEquals(2.0/3.0, futureReader.thenCompose(
-                      reader -> reader.getModifyRatioForUser("poke")
-              ).get().orElseThrow(RuntimeException::new), 0.00001);
-  }
-
-  @Test
-  public void getAverageNumberOfItemsPurchasedTest() throws Exception {
-    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
-
-    assertEquals(OptionalLong.empty(), futureReader.thenCompose(
             reader -> reader.getTotalNumberOfItemsPurchased("cat")).get()
     );
 
@@ -487,6 +441,11 @@ public class BuyProductTest {
     assertEquals(1, futureReader.thenCompose(
             reader -> reader.getTotalNumberOfItemsPurchased("ps4")).get().getAsLong()
     );
+  }
+
+  @Test
+  public void getTotalNumberOfItemsPurchasedTest1() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
     assertEquals(4, futureReader.thenCompose(
             reader -> reader.getTotalNumberOfItemsPurchased("vectrex")).get().getAsLong()
@@ -497,5 +456,51 @@ public class BuyProductTest {
     );
   }
 
+  @Test
+  public void modifiedOrderedThatWhereCanceledShouldCountForRatio() throws Exception{
+      CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+
+      assertEquals(1.0, futureReader.thenCompose(
+              reader -> reader.getModifyRatioForUser("noob")
+      ).get().orElseThrow(RuntimeException::new), 0.00001);
+
+      assertEquals(2.0/3.0, futureReader.thenCompose(
+                      reader -> reader.getModifyRatioForUser("poke")
+              ).get().orElseThrow(RuntimeException::new), 0.00001);
+  }
+
+  @Test
+  public void getAverageNumberOfItemsPurchasedTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals(OptionalDouble.empty(), futureReader.thenCompose(
+            reader -> reader.getAverageNumberOfItemsPurchased("cat")).get()
+    );
+
+    assertEquals(2.0, futureReader.thenCompose(
+            reader -> reader.getAverageNumberOfItemsPurchased("snes")).get()
+            .orElseThrow(RuntimeException::new), 0.00001
+    );
+
+    assertEquals(1.0, futureReader.thenCompose(
+            reader -> reader.getAverageNumberOfItemsPurchased("pc")).get()
+            .orElseThrow(RuntimeException::new), 0.00001
+    );
+
+  }
+
+  @Test
+  public void getCancelRatioForUserTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals(OptionalDouble.empty(), futureReader.thenCompose(
+            reader -> reader.getCancelRatioForUser("cat")).get()
+    );
+
+    assertEquals(4.0 / 6.0, futureReader.thenCompose(
+            reader -> reader.getCancelRatioForUser("pcUser")).get()
+            .orElseThrow(RuntimeException::new), 0.00001
+    );
+  }
 
 }

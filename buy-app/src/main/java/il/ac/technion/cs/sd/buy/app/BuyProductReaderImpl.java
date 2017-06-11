@@ -226,7 +226,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
                                         .map(this::removeKey)
                                         .map(Order::new)
                                         .filter(order -> !order.isCancelled())
-                                        .mapToDouble(Order::getLatestAmount)
+                                        .mapToLong(Order::getLatestAmount)
                                         .average();
                             } else {
                                 return OptionalDouble.empty();

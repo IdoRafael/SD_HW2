@@ -14,6 +14,21 @@
 	{"type":"modify-order","order-id":"cancelled","amount":3},
 	{"type":"cancel-order","order-id":"cancelled"},
 
+	{"type":"order","order-id":"cancelled1","user-id":"pcUser","product-id":"pc","amount":1},
+	{"type":"modify-order","order-id":"cancelled1","amount":3},
+	{"type":"cancel-order","order-id":"cancelled1"},
+
+	{"type":"order","order-id":"cancelled2","user-id":"pcUser","product-id":"pc","amount":1},
+	{"type":"modify-order","order-id":"cancelled2","amount":3},
+	{"type":"cancel-order","order-id":"cancelled2"},
+
+	{"type":"order","order-id":"cancelled3","user-id":"pcUser","product-id":"pc","amount":1},
+	{"type":"modify-order","order-id":"cancelled3","amount":3},
+	{"type":"cancel-order","order-id":"cancelled3"},
+
+	{"type":"order","order-id":"modified","user-id":"pcUser","product-id":"pc","amount":1},
+	{"type":"modify-order","order-id":"modified","amount":3},
+
 	{"type":"order","order-id":"abc","user-id":"cancelledUser","product-id":"pc","amount":1},
 	{"type":"modify-order","order-id":"abc","amount":3},
 	{"type":"cancel-order","order-id":"abc"},
