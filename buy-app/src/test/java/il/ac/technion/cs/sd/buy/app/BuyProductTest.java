@@ -369,13 +369,14 @@ public class BuyProductTest {
   public void getUsersThatPurchasedTest() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
 
-    assertEquals((Long)0L, futureReader.thenCompose(
-            reader -> reader.getTotalAmountSpentByUser("noSuchUser")).get()
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.getUsersThatPurchased("noSuchProduct")
+            ).get().isEmpty()
     );
 
-    //ignore cancelled
-    assertEquals((Long) (100L + 4L * 400L), futureReader.thenCompose(
-            reader -> reader.getTotalAmountSpentByUser("dork")).get()
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.isValidOrderId("abc")
+            ).get()
     );
   }
 
