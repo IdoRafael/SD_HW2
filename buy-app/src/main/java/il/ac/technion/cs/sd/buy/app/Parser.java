@@ -18,13 +18,16 @@ public abstract class Parser {
 
     public void print() {
         System.out.println("Products");
+        System.out.println("--------");
         for (Map.Entry<String,String> entry : products.entrySet()){
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
+        System.out.println("");
         System.out.println("Orders");
+        System.out.println("------");
         for (Map.Entry<String,Order> entry : orders.entrySet()){
-            System.out.println("orderId " + entry.getKey() + " userId " + entry.getValue().getUserId() + " productID "
-                    + entry.getValue().getProductId() + " latestAmount " + entry.getValue().getLatestAmount());
+            System.out.println("orderId: " + entry.getKey() + " userId: " + entry.getValue().getUserId() + " productID: "
+                    + entry.getValue().getProductId() + " latestAmount: " + entry.getValue().getLatestAmount());
             System.out.print("amount history: ");
             for(Integer amount : entry.getValue().getAmountHistory()){
                 System.out.print(amount + " ");

@@ -24,4 +24,9 @@ public class XMLParserTest {
     public void smallTest() throws Exception{
         justRun("small.xml");
     }
+
+    @Test
+    public void largeTest() throws Exception{
+        justRun("large.xml");
+    }
 }
