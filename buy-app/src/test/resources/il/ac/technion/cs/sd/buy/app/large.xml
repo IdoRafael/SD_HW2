@@ -67,10 +67,6 @@
     <id>vectrex</id>
     <price>1000</price>
   </Product>
-  <Product>
-    <id>vectrex</id>
-    <price>800</price>
-  </Product>
   <Order>
     <user-id>geek</user-id>
     <order-id>6</order-id>
@@ -130,6 +126,10 @@
     <order-id>10</order-id>
     <new-amount>6</new-amount>
   </ModifyOrder>
+  <Product>
+    <id>vectrex</id>
+    <price>800</price>
+  </Product>
   <ModifyOrder>
     <order-id>10</order-id>
     <new-amount>7</new-amount>

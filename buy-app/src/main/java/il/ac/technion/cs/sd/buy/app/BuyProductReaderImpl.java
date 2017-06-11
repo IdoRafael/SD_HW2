@@ -222,15 +222,12 @@ public class BuyProductReaderImpl implements BuyProductReader {
                         productsAndOrders.thenCompose(futureStorage -> futureStorage.getAllStringsById(productId)),
                         (exists, list) -> {
                             if (exists) {
-                                OptionalDouble optionalDouble = list.stream()
+                                return list.stream()
                                         .map(this::removeKey)
                                         .map(Order::new)
                                         .filter(order -> !order.isCancelled())
                                         .mapToDouble(Order::getLatestAmount)
                                         .average();
-                                return optionalDouble.isPresent() ? optionalDouble : OptionalDouble.of(0);
-                                //TODO empty or 0? find answer in future huehuehue
-                                //https://piazza.com/class/j0f77eij4k2266?cid=97
                             } else {
                                 return OptionalDouble.empty();
                             }
