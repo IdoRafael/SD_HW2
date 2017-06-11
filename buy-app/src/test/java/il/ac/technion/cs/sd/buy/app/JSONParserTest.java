@@ -5,6 +5,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.SortedMap;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Yaniv on 10/06/2017.
@@ -28,5 +31,26 @@ public class JSONParserTest {
     @Test
     public void smallTest2() throws Exception{
         justRun("small_2.json");
+    }
+
+    @Test
+    public void testProducts() throws Exception{
+        SortedMap<String, String> products = new JSONParser(new XMLParser(getFilesContent("large.xml")).toJSON()).getProducts();
+        assertEquals(products.size(),6);
+        assertEquals(products.get("megadrive"),"200");
+        assertEquals(products.get("vectrex"),"800");
+
+    }
+
+    @Test
+    public void testOrders() throws Exception{
+        SortedMap<String, Order> orders = new JSONParser(new XMLParser(getFilesContent("large.xml")).toJSON()).getOrders();
+        assertEquals(orders.size(),9);
+        assertEquals((long)orders.get("10").getLatestAmount(),7);
+        assertEquals(orders.get("2").isCancelled(),true);
+        assertEquals(orders.get("1").isCancelled(),false);
+        assertEquals(orders.get("8").getUserId(),"nerd");
+        assertEquals(orders.get("7").getProductId(),"gameboy");
+        assertEquals(orders.get("10").getAmountHistory().size(),7);
     }
 }
