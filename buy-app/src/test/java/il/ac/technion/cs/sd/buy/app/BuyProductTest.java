@@ -10,6 +10,7 @@ import org.junit.rules.Timeout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -262,7 +263,7 @@ public class BuyProductTest {
   }
 
   @Test
-  public void modifingOrderShouldCancelItsCancellation() throws Exception{
+  public void modifyingOrderShouldCancelItsCancellation() throws Exception{
     CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
     assertTrue(futureReader.thenCompose(
@@ -303,6 +304,33 @@ public class BuyProductTest {
             reader -> reader.getNumberOfProductOrdered("nonExistentYet")
     ).get().orElseThrow(RuntimeException::new));
 
+  }
+
+  @Test
+  public void getNumberOfProductOrderedTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals(7, futureReader.thenCompose(
+            reader -> reader.getNumberOfProductOrdered("10")
+    ).get().orElseThrow(RuntimeException::new));
+
+    assertEquals(-11, futureReader.thenCompose(
+            reader -> reader.getNumberOfProductOrdered("2")
+    ).get().orElseThrow(RuntimeException::new));
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.getNumberOfProductOrdered("nonExistent")
+    ).get().isPresent());
+  }
+
+  @Test
+  public void getHistoryOfOrderTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals(
+            Arrays.asList(1,2,3,4,5,6,7), futureReader.thenCompose(
+            reader -> reader.getHistoryOfOrder("10")).get()
+    );
   }
 
 

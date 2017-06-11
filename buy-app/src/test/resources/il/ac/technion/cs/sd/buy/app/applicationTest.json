@@ -15,7 +15,7 @@
 	{"type":"cancel-order","order-id":"1"},
 	{"type":"modify-order","order-id":"1","amount":1},
 
-	{"type":"order","order-id":"2","user-id":"noob","product-id":"ps4","amount":1},
+	{"type":"order","order-id":"2","user-id":"noob","product-id":"ps4","amount":11},
 	{"type":"cancel-order","order-id":"2"},
 
 	{"type":"order","order-id":"3","user-id":"noob","product-id":"ps5","amount":1},
