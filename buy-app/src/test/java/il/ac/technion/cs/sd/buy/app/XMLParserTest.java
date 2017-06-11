@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Created by Yaniv on 09/06/2017.
  */
@@ -34,6 +36,8 @@ public class XMLParserTest {
     public void convertToJSON() throws Exception{
         String xml = getFilesContent("large.xml");
         String json = new XMLParser(xml).toJSON();
-        new JSONParser(json).print();
+        assertTrue(new XMLParser(xml).getProducts().equals(new JSONParser(json).getProducts()));
+        assertTrue(new XMLParser(xml).getOrders().equals(new JSONParser(json).getOrders()));
+
     }
 }

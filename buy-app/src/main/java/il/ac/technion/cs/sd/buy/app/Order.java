@@ -52,6 +52,26 @@ public class Order{
         );
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        Order otherOrder = (Order) obj;
+        return orderId.equals(otherOrder.orderId)
+                && userId.equals(otherOrder.userId)
+                && productId.equals(otherOrder.productId)
+                && productPrice.equals(otherOrder.productPrice)
+                && latestAmount.equals(otherOrder.latestAmount)
+                && isCancelled == otherOrder.isCancelled
+                && isModified == otherOrder.isModified
+                && amountHistory.equals(otherOrder.amountHistory);
+    }
+
     public String getOrderId() {
         return orderId;
     }
