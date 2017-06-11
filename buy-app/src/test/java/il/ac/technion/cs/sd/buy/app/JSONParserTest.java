@@ -21,7 +21,7 @@ public class JSONParserTest {
 
     public void justRun(String fileName)throws FileNotFoundException {
         String json = getFilesContent(fileName);
-        new JSONParser(json).print();
+        new JSONParser(json);
     }
 
     @Test

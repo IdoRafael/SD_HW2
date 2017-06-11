@@ -22,7 +22,7 @@ public class XMLParserTest {
 
     public void justRun(String fileName)throws FileNotFoundException {
         String xml = getFilesContent(fileName);
-        new XMLParser(xml).print();
+        new XMLParser(xml);
     }
 
     @Test
