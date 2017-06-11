@@ -20,9 +20,8 @@ public class FutureLineStorageFactoryTestImpl implements FutureLineStorageFactor
                 completedFuture(new FutureLineStorageTestImpl())
         );
 
-        //TODO ADD SLEEP WHEN DONE WRITING TESTS
         try {
-            Thread.sleep(openLineStorages.size() * SLEEP_DURATION * 0);
+            Thread.sleep(openLineStorages.size() * SLEEP_DURATION);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

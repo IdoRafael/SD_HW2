@@ -482,7 +482,7 @@ public class BuyProductTest {
             .orElseThrow(RuntimeException::new), 0.00001
     );
 
-    assertEquals(1.0, futureReader.thenCompose(
+    assertEquals(2.0, futureReader.thenCompose(
             reader -> reader.getAverageNumberOfItemsPurchased("pc")).get()
             .orElseThrow(RuntimeException::new), 0.00001
     );
@@ -500,6 +500,48 @@ public class BuyProductTest {
     assertEquals(4.0 / 6.0, futureReader.thenCompose(
             reader -> reader.getCancelRatioForUser("pcUser")).get()
             .orElseThrow(RuntimeException::new), 0.00001
+    );
+  }
+
+  @Test
+  public void getModifyRatioForUserTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals(OptionalDouble.empty(), futureReader.thenCompose(
+            reader -> reader.getModifyRatioForUser("cat")).get()
+    );
+
+    assertEquals(5.0 / 6.0, futureReader.thenCompose(
+            reader -> reader.getModifyRatioForUser("pcUser")).get()
+            .orElseThrow(RuntimeException::new), 0.00001
+    );
+  }
+
+  @Test
+  public void getAllItemsPurchasedTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.getAllItemsPurchased("cat")).get().isEmpty()
+    );
+
+    assertEquals((Long)4L, futureReader.thenCompose(
+            reader -> reader.getAllItemsPurchased("pcUser"))
+            .get().get("pc")
+    );
+  }
+
+  @Test
+  public void getItemsPurchasedByUsersTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.getItemsPurchasedByUsers("cat")).get().isEmpty()
+    );
+
+    assertEquals((Long)4L, futureReader.thenCompose(
+            reader -> reader.getItemsPurchasedByUsers("pc"))
+            .get().get("pcUser")
     );
   }
 
