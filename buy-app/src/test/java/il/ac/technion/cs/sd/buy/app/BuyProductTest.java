@@ -237,4 +237,30 @@ public class BuyProductTest {
             reader -> reader.getModifyRatioForUser("geek")
     ).get().orElseThrow(RuntimeException::new)));
   }
+
+
+
+  @Test
+  public void modifingOrderShouldCancelItsCancellation() throws Exception{
+    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+
+    CompletableFuture<List<String>> orderIdsThatPurchased = futureReader.thenCompose(
+            reader -> reader.getOrderIdsThatPurchased("turbografx")
+    );
+
+    assertTrue(orderIdsThatPurchased.get().contains("10"));
+
+    assertEquals(0, Double.compare(0.0,  futureReader.thenCompose(
+            reader -> reader.getCancelRatioForUser("nerd")
+    ).get().orElseThrow(RuntimeException::new)));
+
+    System.out.println(futureReader.thenCompose(
+            reader -> reader.getCancelRatioForUser("noob")).get().getAsDouble());
+
+    assertEquals(0, Double.compare((1/3),  futureReader.thenCompose(
+            reader -> reader.getCancelRatioForUser("noob")
+    ).get().orElseThrow(RuntimeException::new)));
+
+  }
+
 }
