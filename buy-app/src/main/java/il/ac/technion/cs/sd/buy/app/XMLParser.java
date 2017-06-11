@@ -118,19 +118,19 @@ public class XMLParser extends Parser{
                     case "Product":
                         jsonObject.addProperty("type", "product");
                         jsonObject.addProperty("id", ((Element) node).getElementsByTagName("id").item(0).getTextContent());
-                        jsonObject.addProperty("price", ((Element) node).getElementsByTagName("price").item(0).getTextContent());
+                        jsonObject.addProperty("price", Integer.parseInt(((Element) node).getElementsByTagName("price").item(0).getTextContent()));
                         break;
                     case "Order":
                         jsonObject.addProperty("type", "order");
                         jsonObject.addProperty("order-id", ((Element) node).getElementsByTagName("order-id").item(0).getTextContent());
                         jsonObject.addProperty("user-id", ((Element) node).getElementsByTagName("user-id").item(0).getTextContent());
                         jsonObject.addProperty("product-id", ((Element) node).getElementsByTagName("product-id").item(0).getTextContent());
-                        jsonObject.addProperty("amount", ((Element) node).getElementsByTagName("amount").item(0).getTextContent());
+                        jsonObject.addProperty("amount", Integer.parseInt(((Element) node).getElementsByTagName("amount").item(0).getTextContent()));
                         break;
                     case "ModifyOrder":
                         jsonObject.addProperty("type", "modify-order");
                         jsonObject.addProperty("order-id", ((Element) node).getElementsByTagName("order-id").item(0).getTextContent());
-                        jsonObject.addProperty("amount", ((Element) node).getElementsByTagName("new-amount").item(0).getTextContent());
+                        jsonObject.addProperty("amount", Integer.parseInt(((Element) node).getElementsByTagName("new-amount").item(0).getTextContent()));
                         break;
                     case "CancelOrder":
                         jsonObject.addProperty("type", "cancel-order");
