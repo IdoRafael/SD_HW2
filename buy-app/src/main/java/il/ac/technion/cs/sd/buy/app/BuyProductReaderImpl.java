@@ -232,8 +232,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
                                         .mapToDouble(Order::getLatestAmount)
                                         .average();
                                 return optionalDouble.isPresent() ? optionalDouble : OptionalDouble.of(0);
-                                //TODO empty or 0? find answer in
-                                //https://piazza.com/class/j0f77eij4k2266?cid=97 huehuehue
+                                //TODO empty or 0? find answer in future huehuehue
+                                //https://piazza.com/class/j0f77eij4k2266?cid=97
                             } else {
                                 return OptionalDouble.empty();
                             }
@@ -242,7 +242,14 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
     @Override
     public CompletableFuture<OptionalDouble> getCancelRatioForUser(String userId) {
-        return null;
+        return usersAndOrders
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
+                .thenApply(list -> list.stream()
+                        .map(this::removeKey)
+                        .map(Order::new)
+                        .map(Order::isCancelled)
+                        .mapToDouble(isCanceled -> (isCanceled ? 1 : 0))
+                        .average());
     }
 
     @Override
