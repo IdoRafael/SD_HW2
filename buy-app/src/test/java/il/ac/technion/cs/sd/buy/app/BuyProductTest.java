@@ -59,14 +59,17 @@ public class BuyProductTest {
   public void testSimpleJson2() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("small_2.json");
 
-    CompletableFuture<Boolean> isValidOrderId = futureReader.thenCompose(reader -> reader.isValidOrderId("foo1234"));
-    CompletableFuture<Boolean> isModifiedOrder = futureReader.thenCompose(reader -> reader.isModifiedOrder("foo1234"));
-    CompletableFuture<Boolean> isCanceledOrder = futureReader.thenCompose(reader -> reader.isCanceledOrder("foo1234"));
+    assertTrue(futureReader.thenCompose(reader -> reader.isValidOrderId("foo1234")).get());
+    assertTrue(futureReader.thenCompose(reader -> reader.isModifiedOrder("foo1234")).get());
+    assertTrue(futureReader.thenCompose(reader -> reader.isCanceledOrder("foo1234")).get());
+  }
 
-    allOf(isValidOrderId, isModifiedOrder, isCanceledOrder).get();
+  @Test
+  public void shouldGetLastProductDefinition() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
-    assertTrue(isValidOrderId.get());
-    assertTrue(isModifiedOrder.get());
-    assertTrue(isCanceledOrder.get());
+    assertTrue(futureReader.thenCompose(reader -> reader.isValidOrderId("foo1234")).get());
+    assertTrue(futureReader.thenCompose(reader -> reader.isModifiedOrder("foo1234")).get());
+    assertTrue(futureReader.thenCompose(reader -> reader.isCanceledOrder("foo1234")).get());
   }
 }

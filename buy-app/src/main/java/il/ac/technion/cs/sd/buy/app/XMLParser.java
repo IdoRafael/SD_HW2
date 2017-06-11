@@ -122,8 +122,8 @@ public class XMLParser extends Parser{
                         break;
                     case "Order":
                         jsonObject.addProperty("type", "order");
-                        jsonObject.addProperty("user-id", ((Element) node).getElementsByTagName("user-id").item(0).getTextContent());
                         jsonObject.addProperty("order-id", ((Element) node).getElementsByTagName("order-id").item(0).getTextContent());
+                        jsonObject.addProperty("user-id", ((Element) node).getElementsByTagName("user-id").item(0).getTextContent());
                         jsonObject.addProperty("product-id", ((Element) node).getElementsByTagName("product-id").item(0).getTextContent());
                         jsonObject.addProperty("amount", ((Element) node).getElementsByTagName("amount").item(0).getTextContent());
                         break;
