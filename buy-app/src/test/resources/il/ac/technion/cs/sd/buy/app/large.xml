@@ -30,6 +30,10 @@
     <product-id>ps4</product-id>
     <amount>1</amount>
   </Order>
+  <ModifyOrder>
+    <order-id>2</order-id>
+    <new-amount>2</new-amount>
+  </ModifyOrder>
   <CancelOrder>
     <order-id>2</order-id>
   </CancelOrder>
@@ -153,5 +157,38 @@
   <Product> //no one will ordered this
     <id>gamecom</id>
     <price>100</price>
+  </Product>
+  <Order>
+    <user-id>poke</user-id>
+    <order-id>thisOrderWillBeModifiedAndCanceled</order-id>
+    <product-id>gamegear</product-id>
+    <amount>1</amount>
+  </Order>
+  <ModifyOrder>
+    <order-id>thisOrderWillBeModifiedAndCanceled</order-id>
+    <new-amount>2</new-amount>
+  </ModifyOrder>
+  <CancelOrder>
+    <order-id>thisOrderWillBeModifiedAndCanceled</order-id>
+  </CancelOrder>
+  <Order>
+    <user-id>poke</user-id>
+    <order-id>thisOrderWillBeModified</order-id>
+    <product-id>gamegear</product-id>
+    <amount>1</amount>
+  </Order>
+  <ModifyOrder>
+    <order-id>thisOrderWillBeModified</order-id>
+    <new-amount>2</new-amount>
+  </ModifyOrder>
+  <Order>
+    <user-id>poke</user-id>
+    <order-id>thisOrderWillRemain</order-id>
+    <product-id>gamegear</product-id>
+    <amount>1</amount>
+  </Order>
+  <Product>
+    <id>gamegear</id>
+    <price>1200</price>
   </Product>
 </Root>

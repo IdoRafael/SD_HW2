@@ -421,6 +421,10 @@ public class BuyProductTest {
   public void numbersOfItemsPurchased() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
+    assertEquals(OptionalLong.empty(), futureReader.thenCompose(
+              reader -> reader.getTotalNumberOfItemsPurchased("cat")).get()
+    );
+
     assertEquals(0, futureReader.thenCompose(
               reader -> reader.getTotalNumberOfItemsPurchased("gamecom")).get().getAsLong()
     );
@@ -429,21 +433,38 @@ public class BuyProductTest {
               reader -> reader.getTotalNumberOfItemsPurchased("megadrive")).get().getAsLong()
     );
 
-      assertEquals(2, futureReader.thenCompose(
-              reader -> reader.getTotalNumberOfItemsPurchased("gameboy")).get().getAsLong()
-      );
+    assertEquals(2, futureReader.thenCompose(
+          reader -> reader.getTotalNumberOfItemsPurchased("gameboy")).get().getAsLong()
+    );
 
-      assertEquals(1, futureReader.thenCompose(
-              reader -> reader.getTotalNumberOfItemsPurchased("ps4")).get().getAsLong()
-      );
+    assertEquals(1, futureReader.thenCompose(
+          reader -> reader.getTotalNumberOfItemsPurchased("ps4")).get().getAsLong()
+    );
 
-      assertEquals(4, futureReader.thenCompose(
-              reader -> reader.getTotalNumberOfItemsPurchased("vectrex")).get().getAsLong()
-      );
+    assertEquals(4, futureReader.thenCompose(
+          reader -> reader.getTotalNumberOfItemsPurchased("vectrex")).get().getAsLong()
+    );
 
-      assertEquals(7, futureReader.thenCompose(
-              reader -> reader.getTotalNumberOfItemsPurchased("turbografx")).get().getAsLong()
-      );
+    assertEquals(7, futureReader.thenCompose(
+          reader -> reader.getTotalNumberOfItemsPurchased("turbografx")).get().getAsLong()
+    );
+  }
+
+  @Test
+    public void modifiedOrderedThatWhereCanceledShouldCountForRatio() throws Exception{
+      CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+
+      assertEquals(0, Double.compare((1.0), futureReader.thenCompose(
+              reader -> reader.getModifyRatioForUser("noob")
+      ).get().orElseThrow(RuntimeException::new)));
+
+      System.out.println(futureReader.thenCompose(
+              reader -> reader.getModifyRatioForUser("poke")
+      ).get());
+
+      assertEquals(0, Double.compare((2/3), futureReader.thenCompose(
+              reader -> reader.getModifyRatioForUser("poke")
+      ).get().orElseThrow(RuntimeException::new)));
   }
 
 }
