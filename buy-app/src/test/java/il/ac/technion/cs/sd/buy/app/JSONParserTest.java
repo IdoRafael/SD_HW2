@@ -37,7 +37,7 @@ public class JSONParserTest {
     @Test
     public void testProducts() throws Exception{
         SortedMap<String, String> products = new JSONParser(new XMLParser(getFilesContent("large.xml")).toJSON()).getProducts();
-        assertEquals(products.size(),6);
+        assertEquals(8, products.size());
         assertEquals(products.get("megadrive"),"200");
         assertEquals(products.get("vectrex"),"800");
 
@@ -46,7 +46,7 @@ public class JSONParserTest {
     @Test
     public void testOrders() throws Exception{
         SortedMap<String, Order> orders = new JSONParser(new XMLParser(getFilesContent("large.xml")).toJSON()).getOrders();
-        assertEquals(orders.size(),9);
+        assertEquals(12, orders.size());
         assertEquals((long)orders.get("10").getLatestAmount(),7);
         assertEquals(orders.get("2").isCancelled(),true);
         assertEquals(orders.get("1").isCancelled(),false);
