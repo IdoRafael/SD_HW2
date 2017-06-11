@@ -29,4 +29,11 @@ public class XMLParserTest {
     public void largeTest() throws Exception{
         justRun("large.xml");
     }
+
+    @Test
+    public void convertToJSON() throws Exception{
+        String xml = getFilesContent("large.xml");
+        String json = new XMLParser(xml).toJSON();
+        new JSONParser(json).print();
+    }
 }

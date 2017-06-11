@@ -1,5 +1,8 @@
 package il.ac.technion.cs.sd.buy.app;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -9,9 +12,23 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class XMLParser extends Parser{
+
+    private String xml;
+
     public XMLParser(String xml) {
+        this.xml=xml;
+        Document document = getDocumentFromString(xml);
+
+        parseProducts(document);
+        parseOrders(document);
+    }
+
+    private Document getDocumentFromString(String xml){
         Document document;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -21,9 +38,7 @@ public class XMLParser extends Parser{
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        parseProducts(document);
-        parseOrders(document);
+        return document;
     }
 
     private void parseProducts(Document document) {
@@ -89,5 +104,46 @@ public class XMLParser extends Parser{
             return;
         }
         orders.get(orderId).setCancelled(true);
+    }
+
+    public String toJSON(){
+        Document document = getDocumentFromString(xml);
+        NodeList nodeList = document.getChildNodes().item(0).getChildNodes();
+        JsonArray jsonArray = new JsonArray();
+        for (int i=0 ; i < nodeList.getLength() ; ++i) {
+            Node node = nodeList.item(i);
+            JsonObject jsonObject = new JsonObject();
+            if (node.getNodeType() == Node.ELEMENT_NODE && !node.getNodeName().equals("Root")) {
+                switch (node.getNodeName()) {
+                    case "Product":
+                        jsonObject.addProperty("type", "product");
+                        jsonObject.addProperty("id", ((Element) node).getElementsByTagName("id").item(0).getTextContent());
+                        jsonObject.addProperty("price", ((Element) node).getElementsByTagName("price").item(0).getTextContent());
+                        break;
+                    case "Order":
+                        jsonObject.addProperty("type", "order");
+                        jsonObject.addProperty("user-id", ((Element) node).getElementsByTagName("user-id").item(0).getTextContent());
+                        jsonObject.addProperty("order-id", ((Element) node).getElementsByTagName("order-id").item(0).getTextContent());
+                        jsonObject.addProperty("product-id", ((Element) node).getElementsByTagName("product-id").item(0).getTextContent());
+                        jsonObject.addProperty("amount", ((Element) node).getElementsByTagName("amount").item(0).getTextContent());
+                        break;
+                    case "ModifyOrder":
+                        jsonObject.addProperty("type", "modify-order");
+                        jsonObject.addProperty("order-id", ((Element) node).getElementsByTagName("order-id").item(0).getTextContent());
+                        jsonObject.addProperty("amount", ((Element) node).getElementsByTagName("new-amount").item(0).getTextContent());
+                        break;
+                    case "CancelOrder":
+                        jsonObject.addProperty("type", "cancel-order");
+                        jsonObject.addProperty("order-id", ((Element) node).getElementsByTagName("order-id").item(0).getTextContent());
+                        break;
+                    default:
+                        break;
+                }
+                jsonArray.add(jsonObject);
+            }
+
+        }
+
+        return new Gson().toJson(jsonArray);
     }
 }
