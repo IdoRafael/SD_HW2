@@ -17,13 +17,13 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ExampleTest {
+public class BuyProductTest {
 
   @Rule public Timeout globalTimeout = Timeout.seconds(30);
 
   private static CompletableFuture<BuyProductReader> setup(String fileName) throws FileNotFoundException {
     String fileContents =
-        new Scanner(new File(ExampleTest.class.getResource(fileName).getFile())).useDelimiter("\\Z").next();
+        new Scanner(new File(BuyProductTest.class.getResource(fileName).getFile())).useDelimiter("\\Z").next();
     Injector injector = Guice.createInjector(new BuyProductModule(), new AbstractModule() {
       @Override
       protected void configure() {
