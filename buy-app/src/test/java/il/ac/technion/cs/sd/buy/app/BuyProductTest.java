@@ -1,7 +1,9 @@
 package il.ac.technion.cs.sd.buy.app;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -23,7 +25,12 @@ public class BuyProductTest {
   private static CompletableFuture<BuyProductReader> setup(String fileName) throws FileNotFoundException {
     String fileContents =
         new Scanner(new File(BuyProductTest.class.getResource(fileName).getFile())).useDelimiter("\\Z").next();
-    Injector injector = Guice.createInjector(new BuyProductTestModule());
+    Injector injector = Guice.createInjector(new BuyProductTestModule(), new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(FutureLineStorageFactory.class).toInstance(new FutureLineStorageFactoryTestImpl());
+      }
+    });
     BuyProductInitializer bpi = injector.getInstance(BuyProductInitializer.class);
 
     return (fileName.endsWith("xml") ? bpi.setupXml(fileContents) : bpi.setupJson(fileContents))

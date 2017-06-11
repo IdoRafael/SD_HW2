@@ -3,18 +3,15 @@ package il.ac.technion.cs.sd.buy.app;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
-import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 import il.ac.technion.cs.sd.buy.library.FutureStorage;
 import il.ac.technion.cs.sd.buy.library.FutureStorageFactory;
 import il.ac.technion.cs.sd.buy.library.FutureStringStorage;
 
-// This module is in the testing project, so that it could easily bind all dependencies from all levels.
 public class BuyProductTestModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(BuyProductInitializer.class).to(BuyProductInitializerImpl.class);
     bind(BuyProductReader.class).to(BuyProductReaderImpl.class);
-    bind(FutureLineStorageFactory.class).toInstance(new FutureLineStorageFactoryTestImpl());
 
     install(new FactoryModuleBuilder()
             .implement(FutureStorage.class, FutureStringStorage.class)
