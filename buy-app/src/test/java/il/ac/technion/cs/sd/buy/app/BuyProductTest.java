@@ -220,5 +220,9 @@ public class BuyProductTest {
             reader -> reader.getTotalNumberOfItemsPurchased("ps4")
     ).get().getAsLong());
 
+    assertEquals(0, Double.compare(2, futureReader.thenCompose(
+            reader -> reader.getAverageNumberOfItemsPurchased("snes")
+    ).get().orElseThrow(RuntimeException::new)));
+
   }
 }
