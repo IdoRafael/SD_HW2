@@ -419,7 +419,7 @@ public class BuyProductTest {
   }
 
   @Test
-  public void numbersOfItemsPurchased() throws Exception {
+  public void getTotalNumberOfItemsPurchasedTest() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
     assertEquals(OptionalLong.empty(), futureReader.thenCompose(
@@ -463,5 +463,39 @@ public class BuyProductTest {
                       reader -> reader.getModifyRatioForUser("poke")
               ).get().orElseThrow(RuntimeException::new), 0.00001);
   }
+
+  @Test
+  public void getAverageNumberOfItemsPurchasedTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+
+    assertEquals(OptionalLong.empty(), futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("cat")).get()
+    );
+
+    assertEquals(0, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("gamecom")).get().getAsLong()
+    );
+
+    assertEquals(30, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("megadrive")).get().getAsLong()
+    );
+
+    assertEquals(2, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("gameboy")).get().getAsLong()
+    );
+
+    assertEquals(1, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("ps4")).get().getAsLong()
+    );
+
+    assertEquals(4, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("vectrex")).get().getAsLong()
+    );
+
+    assertEquals(7, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("turbografx")).get().getAsLong()
+    );
+  }
+
 
 }
