@@ -279,5 +279,12 @@ public class BuyProductTest {
 
   }
 
+  @Test
+  public void shouldIgnoreModifyingOrderNonExistent() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+
+  }
+
 
 }

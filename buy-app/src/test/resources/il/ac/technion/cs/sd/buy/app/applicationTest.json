@@ -1,6 +1,14 @@
 [
+	{"type":"product","id":"pc","price":5000},
 	{"type":"product","id":"megadrive","price":200},
 	{"type":"product","id":"gameboy","price":100},
+
+	{"type":"modify-order","order-id":"nonExistent","amount":3},
+	{"type":"cancel-order","order-id":"nonExistent"},
+
+	{"type":"modify-order","order-id":"nonExistentYet","amount":3},
+	{"type":"cancel-order","order-id":"nonExistentYet"},
+	{"type":"order","order-id":"nonExistentYet","user-id":"pcUser","product-id":"pc","amount":1},
 
 	{"type":"order","order-id":"1","user-id":"noob","product-id":"ps4","amount":2},
 	{"type":"modify-order","order-id":"1","amount":3},
