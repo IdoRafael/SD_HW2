@@ -144,7 +144,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
         SortedMap<String, String> ordersAndHistory = new TreeMap<>(csvStringHistoryComparator);
         orders.forEach(
                 (k, order) -> {
-                    List<Integer> amountHistory = order.getAmountHistory();
+                    List<Long> amountHistory = order.getAmountHistory();
                     IntStream
                             .range(0, amountHistory.size())
                             .forEach(

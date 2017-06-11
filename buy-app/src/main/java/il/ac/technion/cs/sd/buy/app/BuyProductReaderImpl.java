@@ -117,7 +117,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
                                 .map(s -> {
                                     Order orderFound = new Order(removeKey(s));
                                     return OptionalInt.of(
-                                            (orderFound.isCancelled()? -1 : 1) * orderFound.getLatestAmount()
+                                            ((Long)((orderFound.isCancelled()? -1 : 1) * orderFound.getLatestAmount())).intValue()
                                     );
                                 })
                                 .orElse(OptionalInt.empty())

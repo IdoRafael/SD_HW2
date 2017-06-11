@@ -56,8 +56,8 @@ public class JSONParser extends Parser{
             return;
         }
         String userId = jsonObject.get("user-id").getAsString();
-        int amount = jsonObject.get("amount").getAsInt();
-        orders.put(orderId, new Order(orderId, userId, productId, amount, Integer.parseInt(products.get(productId))));
+        Long amount = jsonObject.get("amount").getAsLong();
+        orders.put(orderId, new Order(orderId, userId, productId, amount, Long.parseLong(products.get(productId))));
     }
 
     private void modifyOrder(JsonObject jsonObject){
@@ -65,7 +65,7 @@ public class JSONParser extends Parser{
         if (!orders.containsKey(orderId)){
             return;
         }
-        int newAmount = jsonObject.get("amount").getAsInt();
+        Long newAmount = jsonObject.get("amount").getAsLong();
         //no need to cancel, modifyAmount does this already
         //orders.get(orderId).setCancelled(false);
         orders.get(orderId).modifyAmount(newAmount);

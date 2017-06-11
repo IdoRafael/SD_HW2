@@ -7,13 +7,13 @@ public class Order{
     private String orderId;
     private String userId;
     private String productId;
-    private Integer productPrice;
-    private Integer latestAmount;
+    private Long productPrice;
+    private Long latestAmount;
     private boolean isCancelled;
     private boolean isModified;
-    private List<Integer> amountHistory = new ArrayList<>();
+    private List<Long> amountHistory = new ArrayList<>();
 
-    public Order(String orderId, String userId, String productId, Integer initialAmount, Integer productPrice) {
+    public Order(String orderId, String userId, String productId, Long initialAmount, Long productPrice) {
         this.orderId = orderId;
         this.userId = userId;
         this.productId = productId;
@@ -30,8 +30,8 @@ public class Order{
         this.orderId = splitString[0];
         this.userId = splitString[1];
         this.productId = splitString[2];
-        this.latestAmount = Integer.parseInt(splitString[3]);
-        this.productPrice = Integer.parseInt(splitString[4]);
+        this.latestAmount = Long.parseLong(splitString[3]);
+        this.productPrice = Long.parseLong(splitString[4]);
         this.isCancelled = stringToBoolean(splitString[5]);
         this.isModified = stringToBoolean(splitString[6]);
 
@@ -84,11 +84,11 @@ public class Order{
         return productId;
     }
 
-    public Integer getProductPrice() {
+    public Long getProductPrice() {
         return productPrice;
     }
 
-    public Integer getLatestAmount() {
+    public Long getLatestAmount() {
         return latestAmount;
     }
 
@@ -100,7 +100,7 @@ public class Order{
         return isModified || amountHistory.size() > 1;
     }
 
-    public List<Integer> getAmountHistory() {
+    public List<Long> getAmountHistory() {
         return amountHistory;
     }
 
@@ -108,7 +108,7 @@ public class Order{
         isCancelled = cancelled;
     }
 
-    public void modifyAmount(Integer newAmount) {
+    public void modifyAmount(Long newAmount) {
         latestAmount = newAmount;
         amountHistory.add(newAmount);
         setCancelled(false);

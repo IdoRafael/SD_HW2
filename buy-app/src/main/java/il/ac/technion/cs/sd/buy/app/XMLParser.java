@@ -84,7 +84,7 @@ public class XMLParser extends Parser{
         }
         String userId = ((Element) node).getElementsByTagName("user-id").item(0).getTextContent();
         String amount = ((Element) node).getElementsByTagName("amount").item(0).getTextContent();
-        orders.put(orderId, new Order(orderId, userId, productId, Integer.parseInt(amount), Integer.parseInt(products.get(productId))));
+        orders.put(orderId, new Order(orderId, userId, productId, Long.parseLong(amount), Long.parseLong(products.get(productId))));
     }
 
     private void modifyOrder(Node node){
@@ -96,7 +96,7 @@ public class XMLParser extends Parser{
 
         //no need to cancel, modifyAmount does this already
         //orders.get(orderId).setCancelled(false);
-        orders.get(orderId).modifyAmount(Integer.parseInt(newAmount));
+        orders.get(orderId).modifyAmount(Long.parseLong(newAmount));
     }
 
     private void cancelOrder(Node node){
