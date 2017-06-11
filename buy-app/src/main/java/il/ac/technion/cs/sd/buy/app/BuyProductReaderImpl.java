@@ -254,7 +254,14 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
     @Override
     public CompletableFuture<OptionalDouble> getModifyRatioForUser(String userId) {
-        return null;
+        return usersAndOrders
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
+                .thenApply(list -> list.stream()
+                        .map(this::removeKey)
+                        .map(Order::new)
+                        .map(Order::isModified)
+                        .mapToDouble(isModified -> (isModified ? 1 : 0))
+                        .average());
     }
 
     @Override
