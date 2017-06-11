@@ -134,7 +134,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
                 .thenApply(
                         list -> list
                                 .stream()
-                                .map(s -> Integer.parseInt(removeKey(s)))
+                                .map(this::removeKey)
+                                .map(Integer::parseInt)
                                 .collect(Collectors.toList())
                 );
     }
@@ -146,7 +147,9 @@ public class BuyProductReaderImpl implements BuyProductReader {
                 .thenApply(
                         list -> list
                                 .stream()
-                                .map(s -> new Order(removeKey(s)).getOrderId())
+                                .map(this::removeKey)
+                                .map(Order::new)
+                                .map(Order::getOrderId)
                                 .collect(Collectors.toList())
                 );
     }
@@ -155,11 +158,13 @@ public class BuyProductReaderImpl implements BuyProductReader {
     public CompletableFuture<Long> getTotalAmountSpentByUser(String userId) {
         return usersAndProducts
                 .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
-                .thenApply(list -> list.stream().mapToLong(
-                        s -> {
-                            Order order = new Order(removeKey(s));
-                            return order.getLatestAmount() * order.getProductPrice();
-                        }).sum()
+                .thenApply(
+                        list -> list
+                                .stream()
+                                .map(this::removeKey)
+                                .map(Order::new)
+                                .mapToLong(order -> order.getLatestAmount() * order.getProductPrice())
+                                .sum()
                 );
     }
 
@@ -170,7 +175,9 @@ public class BuyProductReaderImpl implements BuyProductReader {
                 .thenApply(
                         list -> list
                                 .stream()
-                                .map(s -> new Order(removeKey(s)).getUserId())
+                                .map(this::removeKey)
+                                .map(Order::new)
+                                .map(Order::getUserId)
                                 .collect(Collectors.toList())
                 );
     }
@@ -182,7 +189,9 @@ public class BuyProductReaderImpl implements BuyProductReader {
                 .thenApply(
                         list -> list
                                 .stream()
-                                .map(s -> new Order(removeKey(s)).getOrderId())
+                                .map(this::removeKey)
+                                .map(Order::new)
+                                .map(Order::getOrderId)
                                 .collect(Collectors.toList())
                 );
     }
