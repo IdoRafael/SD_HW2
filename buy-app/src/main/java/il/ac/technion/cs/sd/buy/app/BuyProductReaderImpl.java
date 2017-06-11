@@ -266,7 +266,16 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
     @Override
     public CompletableFuture<Map<String, Long>> getAllItemsPurchased(String userId) {
-        return null;
+        return usersAndProducts
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
+                .thenApply(list -> list.stream()
+                        .map(this::removeKey)
+                        .map(Order::new)
+                        .collect(Collectors.toMap(
+                                (Order o) -> o.getProductId(),
+                                (Order o) -> Long.valueOf(o.getLatestAmount())
+                        ))
+                );
     }
 
     @Override
