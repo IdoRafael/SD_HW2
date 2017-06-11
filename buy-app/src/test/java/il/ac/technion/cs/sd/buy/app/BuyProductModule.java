@@ -1,12 +1,8 @@
-package il.ac.technion.cs.sd.buy.test;
+package il.ac.technion.cs.sd.buy.app;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
-import il.ac.technion.cs.sd.buy.app.BuyProductInitializer;
-import il.ac.technion.cs.sd.buy.app.BuyProductInitializerImpl;
-import il.ac.technion.cs.sd.buy.app.BuyProductReader;
-import il.ac.technion.cs.sd.buy.app.BuyProductReaderImpl;
 import il.ac.technion.cs.sd.buy.library.FutureStorage;
 import il.ac.technion.cs.sd.buy.library.FutureStorageFactory;
 import il.ac.technion.cs.sd.buy.library.FutureStringStorage;

@@ -21,8 +21,8 @@ public class FutureStringStorage implements FutureStorage {
     @AssistedInject
     public FutureStringStorage(
             FutureLineStorageFactory lineStorageFactory,
-            Comparator<String> firstIdComparator,
-            Comparator<String> secondaryIdComparator,
+            @Assisted("firstIdComparator") Comparator<String> firstIdComparator,
+            @Assisted("secondaryIdComparator") Comparator<String> secondaryIdComparator,
             @Assisted String fileName
     ) {
         this.futureLineStorage = lineStorageFactory.open(fileName);
@@ -33,8 +33,8 @@ public class FutureStringStorage implements FutureStorage {
     @AssistedInject
     public FutureStringStorage(
             FutureLineStorageFactory lineStorageFactory,
-            Comparator<String> firstIdComparator,
-            Comparator<String> secondaryIdComparator,
+            @Assisted("firstIdComparator") Comparator<String> firstIdComparator,
+            @Assisted("secondaryIdComparator") Comparator<String> secondaryIdComparator,
             @Assisted String fileName,
             @Assisted SortedMap<String, String> sortedMap
     ) {

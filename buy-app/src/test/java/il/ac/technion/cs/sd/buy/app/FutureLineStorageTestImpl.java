@@ -1,4 +1,4 @@
-package il.ac.technion.cs.sd.buy.library;
+package il.ac.technion.cs.sd.buy.app;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 
