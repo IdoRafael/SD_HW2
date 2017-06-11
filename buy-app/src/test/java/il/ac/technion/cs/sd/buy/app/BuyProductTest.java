@@ -223,6 +223,18 @@ public class BuyProductTest {
     assertEquals(0, Double.compare(2, futureReader.thenCompose(
             reader -> reader.getAverageNumberOfItemsPurchased("snes")
     ).get().orElseThrow(RuntimeException::new)));
+  }
 
+  @Test
+  public void reorderingShouldReset3() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals(0, Double.compare(0, futureReader.thenCompose(
+            reader -> reader.getCancelRatioForUser("geek")
+    ).get().orElseThrow(RuntimeException::new)));
+
+    assertEquals(0, Double.compare(0.5, futureReader.thenCompose(
+            reader -> reader.getModifyRatioForUser("geek")
+    ).get().orElseThrow(RuntimeException::new)));
   }
 }
