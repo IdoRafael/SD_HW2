@@ -17,6 +17,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
     private static final String DELIMITER = ",";
 
     private FutureStorageFactory futureStorageFactory;
+    private CompletableFuture<FutureStorage> productsAndPrices;
     private CompletableFuture<FutureStorage> usersAndOrders;
     private CompletableFuture<FutureStorage> ordersAndProducts;
     private CompletableFuture<FutureStorage> ordersAndHistory;
@@ -27,6 +28,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
     @Inject
     public BuyProductReaderImpl(
             FutureStorageFactory futureStorageFactory,
+            @Named("productsAndPricesFileName") String productsAndPricesFileName,
             @Named("usersAndOrdersFileName") String usersAndOrdersFileName,
             @Named("ordersAndProductsFileName") String ordersAndProductsFileName,
             @Named("ordersAndHistoryFileName") String ordersAndHistoryFileName,
@@ -36,6 +38,13 @@ public class BuyProductReaderImpl implements BuyProductReader {
     )
     {
         this.futureStorageFactory = futureStorageFactory;
+
+        this.productsAndPrices = futureStorageFactory.create(
+                productsAndPricesFileName,
+                String::compareTo,
+                String::compareTo
+        ).getFuture();
+
         this.usersAndOrders = futureStorageFactory.create(
                 usersAndOrdersFileName,
                 String::compareTo,
@@ -146,14 +155,12 @@ public class BuyProductReaderImpl implements BuyProductReader {
     public CompletableFuture<Long> getTotalAmountSpentByUser(String userId) {
         return usersAndProducts
                 .thenCompose(futureStorage -> futureStorage.getAllStringsById(userId))
-                .thenApply(list -> {
-                    Long sum = 0L;
-                    for (String s: list) {
-                        Order order = new Order(removeKey(s));
-                        sum += order.getLatestAmount() * order.getProductPrice();
-                    }
-                    return sum;
-                });
+                .thenApply(list -> list.stream().mapToLong(
+                        s -> {
+                            Order order = new Order(removeKey(s));
+                            return order.getLatestAmount() * order.getProductPrice();
+                        }).sum()
+                );
     }
 
     @Override
@@ -182,11 +189,18 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
     @Override
     public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String productId) {
-        //TODO NOT SDONE LOLZSW
-        return productsAndUsers
-                .thenCompose(futureStorage -> futureStorage.getAllStringsById(productId))
-                .thenApply(list -> {
-                    return OptionalLong.empty();
+        productsAndPrices
+                .thenCompose(futureStorage -> futureStorage.existsBySingleId(productId))
+                .thenCombine(
+                        productsAndUsers.thenCompose(futureStorage -> futureStorage.getAllStringsById(productId)),
+                        (exists, list) -> {
+                            if (exists) {
+                                list.stream().map().reduce()
+
+                                return OptionalLong.empty();
+                            } else {
+                                return OptionalLong.empty();
+                            }
                 });
     }
 

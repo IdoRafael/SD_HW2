@@ -10,12 +10,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
 import static java.util.concurrent.CompletableFuture.allOf;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class BuyProductInitializerImpl implements BuyProductInitializer{
     private static final String DELIMITER = ",";
 
     private FutureStorageFactory futureStorageFactory;
+
+    private String productsAndPricesFileName;
     private String usersAndOrdersFileName;
     private String ordersAndProductsFileName;
     private String ordersAndHistoryFileName;
@@ -26,6 +27,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
     @Inject
     public BuyProductInitializerImpl(
             FutureStorageFactory futureStorageFactory,
+            @Named("productsAndPricesFileName") String productsAndPricesFileName,
             @Named("usersAndOrdersFileName") String usersAndOrdersFileName,
             @Named("ordersAndProductsFileName") String ordersAndProductsFileName,
             @Named("ordersAndHistoryFileName") String ordersAndHistoryFileName,
@@ -61,12 +63,33 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
 
 
         return allOf(
+                setupProductsAndPrices(parser.getProducts(), csvStringComparator),
                 setupUsersAndOrders(orders, csvStringComparator),
                 setupOrdersAndProducts(orders, csvStringComparator),
                 setupOrdersAndHistory(orders),
                 setupProductsAndOrders(orders, csvStringComparator),
                 setupUsersAndProducts(orders, csvStringComparator)
         );
+    }
+
+    private CompletableFuture<FutureStorage> setupProductsAndPrices(
+            SortedMap<String, String> products,
+            Comparator<String> comparator
+    ) {
+        SortedMap<String, String> productsAndPrices = new TreeMap<>(comparator);
+        products.forEach(
+                (productId, productPrice) -> productsAndPrices.put(
+                        String.join(DELIMITER, productId, productPrice),
+                        "0"
+                )
+        );
+        return futureStorageFactory.create(
+                productsAndPricesFileName,
+                String::compareTo,
+                String::compareTo,
+                productsAndPrices
+        )
+                .getFuture();
     }
 
     private CompletableFuture<FutureStorage> setupUsersAndOrders(
