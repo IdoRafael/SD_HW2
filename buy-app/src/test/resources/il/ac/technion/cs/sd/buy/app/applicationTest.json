@@ -10,6 +10,10 @@
 	{"type":"cancel-order","order-id":"nonExistentYet"},
 	{"type":"order","order-id":"nonExistentYet","user-id":"pcUser","product-id":"pc","amount":1},
 
+	{"type":"order","order-id":"cancelled","user-id":"pcUser","product-id":"pc","amount":1},
+	{"type":"modify-order","order-id":"cancelled","amount":3},
+	{"type":"cancel-order","order-id":"cancelled"},
+
 	{"type":"order","order-id":"1","user-id":"noob","product-id":"ps4","amount":2},
 	{"type":"modify-order","order-id":"1","amount":3},
 	{"type":"cancel-order","order-id":"1"},

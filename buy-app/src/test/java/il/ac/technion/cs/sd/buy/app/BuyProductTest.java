@@ -329,7 +329,17 @@ public class BuyProductTest {
 
     assertEquals(
             Arrays.asList(1,2,3,4,5,6,7), futureReader.thenCompose(
-            reader -> reader.getHistoryOfOrder("10")).get()
+                    reader -> reader.getHistoryOfOrder("10")).get()
+    );
+
+    assertEquals(
+            Arrays.asList(11, -1), futureReader.thenCompose(
+                    reader -> reader.getHistoryOfOrder("2")).get()
+    );
+
+    assertEquals(
+            Arrays.asList(1, 3, -1), futureReader.thenCompose(
+                    reader -> reader.getHistoryOfOrder("cancelled")).get()
     );
   }
 
