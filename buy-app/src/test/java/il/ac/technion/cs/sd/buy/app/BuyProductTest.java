@@ -283,6 +283,25 @@ public class BuyProductTest {
   public void shouldIgnoreModifyingOrderNonExistent() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
 
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isValidOrderId("nonExistent")
+    ).get());
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.isValidOrderId("nonExistentYet")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isModifiedOrder("nonExistentYet")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isCanceledOrder("nonExistentYet")
+    ).get());
+
+    assertEquals(1, futureReader.thenCompose(
+            reader -> reader.getNumberOfProductOrdered("nonExistentYet")
+    ).get().orElseThrow(RuntimeException::new));
 
   }
 
