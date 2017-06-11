@@ -378,8 +378,45 @@ public class BuyProductTest {
             reader -> reader.isValidOrderId("abc")
             ).get()
     );
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.isCanceledOrder("abc")
+            ).get()
+    );
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.isModifiedOrder("abc")
+            ).get()
+    );
+
+    CompletableFuture<List<String>> usersThatPurchasedPc = futureReader.thenCompose(
+            reader -> reader.getUsersThatPurchased("pc")
+    );
+
+    assertTrue(usersThatPurchasedPc.get().contains("pcUser"));
+    assertEquals(1, usersThatPurchasedPc.get().size());
+    assertFalse(usersThatPurchasedPc.get().contains("cancelledUser"));
   }
 
+  @Test
+  public void getOrderIdsThatPurchasedTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals(
+            Arrays.asList("6", "notCancelled"),
+            futureReader.thenCompose(
+                    reader -> reader.getOrderIdsThatPurchased("snes")
+            ).get()
+    );
+
+    //including cancelled
+    assertTrue(
+            futureReader.thenCompose(
+                    reader -> reader.getOrderIdsThatPurchased("ps4")
+            ).get().contains("2")
+    );
+
+  }
     @Test
     public void numbersOfItemsPurchased() throws Exception {
       CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
