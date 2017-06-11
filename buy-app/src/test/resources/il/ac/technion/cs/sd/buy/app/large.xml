@@ -150,4 +150,8 @@
     <product-id>xbox720</product-id>
     <amount>1</amount>
   </Order>
+  <Product> //no one will ordered this
+    <id>gamecom</id>
+    <price>100</price>
+  </Product>
 </Root>

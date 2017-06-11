@@ -380,5 +380,33 @@ public class BuyProductTest {
     );
   }
 
+    @Test
+    public void numbersOfItemsPurchased() throws Exception {
+      CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+
+      assertEquals(0, futureReader.thenCompose(
+                reader -> reader.getTotalNumberOfItemsPurchased("gamecom")).get().getAsLong()
+      );
+
+      assertEquals(30, futureReader.thenCompose(
+                reader -> reader.getTotalNumberOfItemsPurchased("megadrive")).get().getAsLong()
+      );
+
+        assertEquals(2, futureReader.thenCompose(
+                reader -> reader.getTotalNumberOfItemsPurchased("gameboy")).get().getAsLong()
+        );
+
+        assertEquals(1, futureReader.thenCompose(
+                reader -> reader.getTotalNumberOfItemsPurchased("ps4")).get().getAsLong()
+        );
+
+        assertEquals(4, futureReader.thenCompose(
+                reader -> reader.getTotalNumberOfItemsPurchased("vectrex")).get().getAsLong()
+        );
+
+        assertEquals(7, futureReader.thenCompose(
+                reader -> reader.getTotalNumberOfItemsPurchased("turbografx")).get().getAsLong()
+        );
+    }
 
 }
