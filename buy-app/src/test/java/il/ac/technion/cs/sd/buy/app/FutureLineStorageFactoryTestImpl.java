@@ -19,11 +19,13 @@ public class FutureLineStorageFactoryTestImpl implements FutureLineStorageFactor
         openLineStorages.putIfAbsent(s,
                 completedFuture(new FutureLineStorageTestImpl())
         );
-        try {
+
+        //TODO ADD SLEEP WHEN DONE WRITING TESTS
+        /*try {
             Thread.sleep(SLEEP_DURATION);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         return openLineStorages.get(s);
     }
 }

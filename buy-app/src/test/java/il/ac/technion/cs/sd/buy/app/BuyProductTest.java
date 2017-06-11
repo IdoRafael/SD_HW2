@@ -10,12 +10,12 @@ import org.junit.rules.Timeout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.allOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BuyProductTest {
@@ -68,8 +68,58 @@ public class BuyProductTest {
   public void shouldGetLastProductDefinition() throws Exception {
     CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
-    assertTrue(futureReader.thenCompose(reader -> reader.isValidOrderId("foo1234")).get());
-    assertTrue(futureReader.thenCompose(reader -> reader.isModifiedOrder("foo1234")).get());
-    assertTrue(futureReader.thenCompose(reader -> reader.isCanceledOrder("foo1234")).get());
+    //800 and not old price of 1000
+    Long expected = (long)(7 * 500 + 4 * 800);
+    assertEquals(expected, futureReader.thenCompose(reader -> reader.getTotalAmountSpentByUser("nerd")).get());
+  }
+
+  @Test
+  public void shouldIgnoreOrdersOfNonExistentProducts() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.getUsersThatPurchased("ps5")
+    ).get().isEmpty());
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.getOrderIdsThatPurchased("ps5")
+    ).get().isEmpty());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("ps5")
+    ).get().isPresent());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.getAverageNumberOfItemsPurchased("ps5")
+    ).get().isPresent());
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.getItemsPurchasedByUsers("ps5")
+    ).get().isEmpty());
+  }
+
+  @Test
+  public void shouldIgnoreOrdersOfNonExistentProducts2() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isValidOrderId("ps5")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isCanceledOrder("ps5")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isModifiedOrder("ps5")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.getNumberOfProductOrdered("ps5")
+    ).get().isPresent());
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.getHistoryOfOrder("ps5")
+    ).get().isEmpty());
   }
 }
