@@ -341,6 +341,14 @@ public class BuyProductTest {
             Arrays.asList(1, 3, -1), futureReader.thenCompose(
                     reader -> reader.getHistoryOfOrder("cancelled")).get()
     );
+
+    assertEquals(
+            new ArrayList<>(),
+            futureReader.thenCompose(
+                    reader -> reader
+                            .getHistoryOfOrder("nonExistent")
+            ).get()
+    );
   }
 
 
