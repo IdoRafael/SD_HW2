@@ -272,15 +272,24 @@ public class BuyProductReaderImpl implements BuyProductReader {
                         .map(this::removeKey)
                         .map(Order::new)
                         .collect(Collectors.toMap(
-                                (Order o) -> o.getProductId(),
-                                (Order o) -> Long.valueOf(o.getLatestAmount())
+                                Order::getProductId,
+                                o -> Long.valueOf(o.getLatestAmount())
                         ))
                 );
     }
 
     @Override
     public CompletableFuture<Map<String, Long>> getItemsPurchasedByUsers(String productId) {
-        return null;
+        return productsAndUsers
+                .thenCompose(futureStorage -> futureStorage.getAllStringsById(productId))
+                .thenApply(list -> list.stream()
+                        .map(this::removeKey)
+                        .map(Order::new)
+                        .collect(Collectors.toMap(
+                                Order::getUserId,
+                                o -> Long.valueOf(o.getLatestAmount())
+                        ))
+                );
     }
 
     private String removeKey(String s) {
