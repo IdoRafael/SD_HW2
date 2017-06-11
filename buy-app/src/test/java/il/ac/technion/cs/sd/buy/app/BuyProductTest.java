@@ -236,31 +236,48 @@ public class BuyProductTest {
     assertEquals(0, Double.compare(0.5, futureReader.thenCompose(
             reader -> reader.getModifyRatioForUser("geek")
     ).get().orElseThrow(RuntimeException::new)));
+
+    CompletableFuture<Map<String, Long>> allItemsPurchased = futureReader.thenCompose(
+            reader -> reader.getAllItemsPurchased("geek")
+    );
+    assertTrue(allItemsPurchased.get().containsKey("megadrive"));
+    assertTrue(allItemsPurchased.get().containsKey("gameboy"));
+    assertFalse(allItemsPurchased.get().containsKey("snes"));
+    assertFalse(allItemsPurchased.get().containsKey("ps4"));
+
+    CompletableFuture<Map<String, Long>> snesPurchasedByUsers = futureReader.thenCompose(
+            reader -> reader.getItemsPurchasedByUsers("snes")
+    );
+    assertTrue(snesPurchasedByUsers.get().containsKey("dork"));
+    assertFalse(snesPurchasedByUsers.get().containsKey("geek"));
+
+    CompletableFuture<Map<String, Long>> ps4PurchasedByUsers = futureReader.thenCompose(
+            reader -> reader.getItemsPurchasedByUsers("ps4")
+    );
+    assertTrue(ps4PurchasedByUsers.get().containsKey("noob"));
+
+    assertEquals((Long)1L, ps4PurchasedByUsers.get().get("noob"));
+
+    assertEquals(1, ps4PurchasedByUsers.get().size());
   }
-
-
 
   @Test
   public void modifingOrderShouldCancelItsCancellation() throws Exception{
     CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
 
-    CompletableFuture<List<String>> orderIdsThatPurchased = futureReader.thenCompose(
-            reader -> reader.getOrderIdsThatPurchased("turbografx")
-    );
-
-    assertTrue(orderIdsThatPurchased.get().contains("10"));
+    assertTrue(futureReader.thenCompose(
+            reader1 -> reader1.getOrderIdsThatPurchased("turbografx")
+    ).get().contains("10"));
 
     assertEquals(0, Double.compare(0.0,  futureReader.thenCompose(
             reader -> reader.getCancelRatioForUser("nerd")
     ).get().orElseThrow(RuntimeException::new)));
 
-    System.out.println(futureReader.thenCompose(
-            reader -> reader.getCancelRatioForUser("noob")).get().getAsDouble());
-
-    assertEquals(0, Double.compare((1/3),  futureReader.thenCompose(
+    assertEquals(0, Double.compare((0.5),  futureReader.thenCompose(
             reader -> reader.getCancelRatioForUser("noob")
     ).get().orElseThrow(RuntimeException::new)));
 
   }
+
 
 }
