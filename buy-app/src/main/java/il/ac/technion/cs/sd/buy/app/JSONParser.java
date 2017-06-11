@@ -50,11 +50,12 @@ public class JSONParser extends Parser{
 
     private void handleOrder(JsonObject jsonObject){
         String productId = jsonObject.get("product-id").getAsString();
+        String orderId = jsonObject.get("order-id").getAsString();
+        orders.remove(orderId);
         if (!products.containsKey(productId)) {
             return;
         }
         String userId = jsonObject.get("user-id").getAsString();
-        String orderId = jsonObject.get("order-id").getAsString();
         int amount = jsonObject.get("amount").getAsInt();
         orders.put(orderId, new Order(orderId, userId, productId, amount, Integer.parseInt(products.get(productId))));
     }
