@@ -16,7 +16,6 @@ public class BuyProductReaderImpl implements BuyProductReader {
     private CompletableFuture<Void> finishedConstructing;
     private static final String DELIMITER = ",";
 
-    private FutureStorageFactory futureStorageFactory;
     private CompletableFuture<FutureStorage> productsAndPrices;
     private CompletableFuture<FutureStorage> usersAndOrders;
     private CompletableFuture<FutureStorage> ordersAndProducts;
@@ -37,8 +36,6 @@ public class BuyProductReaderImpl implements BuyProductReader {
             @Named("productsAndUsersFileName") String productsAndUsersFileName
     )
     {
-        this.futureStorageFactory = futureStorageFactory;
-
         this.productsAndPrices = futureStorageFactory.create(
                 productsAndPricesFileName,
                 String::compareTo,
