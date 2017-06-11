@@ -9,7 +9,8 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class FutureLineStorageFactoryTestImpl implements FutureLineStorageFactory {
-    private static final int SLEEP_DURATION = 1;
+    private static final int SLEEP_DURATION = 700;
+
     private HashMap<String, CompletableFuture<FutureLineStorage>>
             openLineStorages = new HashMap<>();
 
