@@ -351,5 +351,33 @@ public class BuyProductTest {
     );
   }
 
+  @Test
+  public void getTotalAmountSpentByUserTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals((Long)0L, futureReader.thenCompose(
+            reader -> reader.getTotalAmountSpentByUser("noSuchUser")).get()
+    );
+
+    //ignore cancelled
+    assertEquals((Long) (100L + 4L * 400L), futureReader.thenCompose(
+            reader -> reader.getTotalAmountSpentByUser("dork")).get()
+    );
+  }
+
+  @Test
+  public void getUsersThatPurchasedTest() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertEquals((Long)0L, futureReader.thenCompose(
+            reader -> reader.getTotalAmountSpentByUser("noSuchUser")).get()
+    );
+
+    //ignore cancelled
+    assertEquals((Long) (100L + 4L * 400L), futureReader.thenCompose(
+            reader -> reader.getTotalAmountSpentByUser("dork")).get()
+    );
+  }
+
 
 }
