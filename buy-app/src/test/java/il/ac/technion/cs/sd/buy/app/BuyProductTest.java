@@ -202,9 +202,23 @@ public class BuyProductTest {
     assertTrue(usersThatPurchasedSnes.get().contains("dork"));
     assertFalse(usersThatPurchasedSnes.get().contains("geek"));
 
-    CompletableFuture<List<String>> usersThatPurchasedSnes = futureReader.thenCompose(
-            reader -> reader.getUsersThatPurchased("snes")
+    CompletableFuture<List<String>> orderIdsThatPurchased = futureReader.thenCompose(
+            reader -> reader.getOrderIdsThatPurchased("ps4")
     );
+
+    assertFalse(orderIdsThatPurchased.get().contains("6"));
+    assertFalse(orderIdsThatPurchased.get().contains("notCancelled"));
+
+    assertTrue(orderIdsThatPurchased.get().contains("1"));
+    assertTrue(orderIdsThatPurchased.get().contains("2"));
+
+    assertEquals(4, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("snes")
+    ).get().getAsLong());
+
+    assertEquals(1, futureReader.thenCompose(
+            reader -> reader.getTotalNumberOfItemsPurchased("ps4")
+    ).get().getAsLong());
 
   }
 }
