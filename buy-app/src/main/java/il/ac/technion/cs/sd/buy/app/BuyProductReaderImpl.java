@@ -195,7 +195,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
                         productsAndUsers.thenCompose(futureStorage -> futureStorage.getAllStringsById(productId)),
                         (exists, list) -> {
                             if (exists) {
-                                list.stream().map().reduce()
+                                list.stream().map().reduce
 
                                 return OptionalLong.empty();
                             } else {
