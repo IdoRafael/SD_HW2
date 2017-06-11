@@ -198,15 +198,19 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
     @Override
     public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String productId) {
-        productsAndPrices
+        return productsAndPrices
                 .thenCompose(futureStorage -> futureStorage.existsBySingleId(productId))
                 .thenCombine(
                         productsAndUsers.thenCompose(futureStorage -> futureStorage.getAllStringsById(productId)),
                         (exists, list) -> {
                             if (exists) {
-                                list.stream().map().reduce
-
-                                return OptionalLong.empty();
+                                return OptionalLong.of(
+                                        list.stream()
+                                                .map(this::removeKey)
+                                                .map(Order::new)
+                                                .mapToLong(Order::getLatestAmount)
+                                                .sum()
+                                );
                             } else {
                                 return OptionalLong.empty();
                             }
@@ -215,7 +219,24 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
     @Override
     public CompletableFuture<OptionalDouble> getAverageNumberOfItemsPurchased(String productId) {
-        return null;
+        return productsAndPrices
+                .thenCompose(futureStorage -> futureStorage.existsBySingleId(productId))
+                .thenCombine(
+                        productsAndOrders.thenCompose(futureStorage -> futureStorage.getAllStringsById(productId)),
+                        (exists, list) -> {
+                            if (exists) {
+                                return list.stream()
+                                        .map(this::removeKey)
+                                        .map(Order::new)
+                                        .filter(order -> !order.isCancelled())
+                                        .mapToDouble(Order::getLatestAmount)
+                                        .average();
+                                //TODO empty or 0? find answer in
+                                //CompletableFuture<https://piazza.com/class/j0f77eij4k2266?cid=97> huehuehue
+                            } else {
+                                return OptionalDouble.empty();
+                            }
+                        });
     }
 
     @Override

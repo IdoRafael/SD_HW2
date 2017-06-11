@@ -36,6 +36,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer{
             @Named("productsAndUsersFileName") String productsAndUsersFileName)
     {
         this.futureStorageFactory = futureStorageFactory;
+        this.productsAndPricesFileName = productsAndPricesFileName;
         this.usersAndOrdersFileName = usersAndOrdersFileName;
         this.ordersAndProductsFileName = ordersAndProductsFileName;
         this.ordersAndHistoryFileName = ordersAndHistoryFileName;
