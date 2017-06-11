@@ -66,7 +66,7 @@ public class BuyProductTest {
 
   @Test
   public void shouldGetLastProductDefinition() throws Exception {
-    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
 
     //800 and not old price of 1000
     Long expected = (long)(7 * 500 + 4 * 800);
@@ -74,8 +74,8 @@ public class BuyProductTest {
   }
 
   @Test
-  public void shouldIgnoreOrdersOfNonExistentProducts() throws Exception {
-    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+  public void shouldIgnoreNonExistentProducts() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
 
     assertTrue(futureReader.thenCompose(
             reader -> reader.getUsersThatPurchased("ps5")
@@ -99,8 +99,8 @@ public class BuyProductTest {
   }
 
   @Test
-  public void shouldIgnoreOrdersOfNonExistentProducts2() throws Exception {
-    CompletableFuture<BuyProductReader> futureReader = setup("large.xml");
+  public void shouldIgnoreNonExistentProducts2() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
 
     assertFalse(futureReader.thenCompose(
             reader -> reader.isValidOrderId("ps5")
@@ -121,5 +121,90 @@ public class BuyProductTest {
     assertTrue(futureReader.thenCompose(
             reader -> reader.getHistoryOfOrder("ps5")
     ).get().isEmpty());
+  }
+
+  @Test
+  public void shouldIgnoreNonExistentProducts3() throws Exception {
+        CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+        assertFalse(futureReader.thenCompose(
+                reader -> reader.getOrderIdsForUser("noob")
+        ).get().contains("ps5"));
+
+        assertFalse(futureReader.thenCompose(
+                reader -> reader.getAllItemsPurchased("noob")
+        ).get().containsKey("ps5"));
+    }
+
+  @Test
+  public void reorderingShouldReset() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.isValidOrderId("6")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isCanceledOrder("6")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isModifiedOrder("6")
+    ).get());
+
+    assertEquals(2, futureReader.thenCompose(
+            reader -> reader.getNumberOfProductOrdered("6")
+    ).get().getAsInt());
+
+    CompletableFuture<List<Integer>> historyOfOrder = futureReader.thenCompose(
+            reader -> reader.getHistoryOfOrder("6")
+    );
+
+    assertEquals(1, historyOfOrder.get().size());
+    assertTrue(historyOfOrder.get().contains(2));
+  }
+
+  @Test
+  public void reorderingShouldReset1() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    assertTrue(futureReader.thenCompose(
+            reader -> reader.isValidOrderId("notCancelled")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isCanceledOrder("notCancelled")
+    ).get());
+
+    assertFalse(futureReader.thenCompose(
+            reader -> reader.isModifiedOrder("notCancelled")
+    ).get());
+
+    assertEquals(2, futureReader.thenCompose(
+            reader -> reader.getNumberOfProductOrdered("notCancelled")
+    ).get().getAsInt());
+
+    CompletableFuture<List<Integer>> historyOfOrder = futureReader.thenCompose(
+            reader -> reader.getHistoryOfOrder("notCancelled")
+    );
+
+    assertEquals(1, historyOfOrder.get().size());
+    assertTrue(historyOfOrder.get().contains(2));
+  }
+
+  @Test
+  public void reorderingShouldReset2() throws Exception {
+    CompletableFuture<BuyProductReader> futureReader = setup("applicationTest.json");
+
+    CompletableFuture<List<String>> usersThatPurchasedSnes = futureReader.thenCompose(
+            reader -> reader.getUsersThatPurchased("snes")
+    );
+    assertTrue(usersThatPurchasedSnes.get().contains("dork"));
+    assertFalse(usersThatPurchasedSnes.get().contains("geek"));
+
+    CompletableFuture<List<String>> usersThatPurchasedSnes = futureReader.thenCompose(
+            reader -> reader.getUsersThatPurchased("snes")
+    );
+
   }
 }

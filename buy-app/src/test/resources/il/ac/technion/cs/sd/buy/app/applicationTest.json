@@ -14,11 +14,23 @@
 	{"type":"product","id":"snes","price":400},
 	{"type":"product","id":"turbografx","price":500},
 	{"type":"product","id":"vectrex","price":1000},
+
 	{"type":"order","order-id":"6","user-id":"geek","product-id":"snes","amount":1},
-	{"type":"order","order-id":"6","user-id":"dork","product-id":"snes","amount":1},
+	{"type":"order","order-id":"6","user-id":"geek","product-id":"ps4","amount":1},
+	{"type":"modify-order","order-id":"6","amount":70},
+	{"type":"cancel-order","order-id":"6"},
+	{"type":"modify-order","order-id":"6","amount":99},
+	{"type":"order","order-id":"6","user-id":"dork","product-id":"snes","amount":2},
+
+	{"type":"order","order-id":"notCancelled","user-id":"geek","product-id":"snes","amount":1},
+	{"type":"order","order-id":"notCancelled","user-id":"geek","product-id":"ps4","amount":1},
+	{"type":"cancel-order","order-id":"notCancelled"},
+	{"type":"order","order-id":"notCancelled","user-id":"dork","product-id":"snes","amount":2},
+
 	{"type":"order","order-id":"7","user-id":"dork","product-id":"gameboy","amount":1},
 	{"type":"order","order-id":"8","user-id":"nerd","product-id":"vectrex","amount":2},
 	{"type":"order","order-id":"9","user-id":"nerd","product-id":"vectrex","amount":2},
+
 	{"type":"order","order-id":"10","user-id":"nerd","product-id":"turbografx","amount":1},
 	{"type":"cancel-order","order-id":"10"},
 	{"type":"modify-order","order-id":"10","amount":2},
@@ -26,7 +38,10 @@
 	{"type":"modify-order","order-id":"10","amount":4},
 	{"type":"modify-order","order-id":"10","amount":5},
 	{"type":"modify-order","order-id":"10","amount":6},
+
 	{"type":"product","id":"vectrex","price":800},
+
 	{"type":"modify-order","order-id":"10","amount":7},
+
 	{"type":"product","id":"ps4","price":1200}
 ]
