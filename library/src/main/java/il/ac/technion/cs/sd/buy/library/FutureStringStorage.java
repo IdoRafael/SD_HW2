@@ -17,6 +17,7 @@ public class FutureStringStorage implements FutureStorage {
     private Comparator<String> secondaryIdComparator;
 
     private static final String DELIMITER = ",";
+    private CompletableFuture<Void> currentWrite;
 
     @AssistedInject
     public FutureStringStorage(
@@ -28,6 +29,7 @@ public class FutureStringStorage implements FutureStorage {
         this.futureLineStorage = lineStorageFactory.open(fileName);
         this.firstIdComparator = firstIdComparator;
         this.secondaryIdComparator = secondaryIdComparator;
+        this.currentWrite = futureLineStorage.thenCompose(ls -> completedFuture(null));
     }
 
     @AssistedInject
@@ -40,26 +42,27 @@ public class FutureStringStorage implements FutureStorage {
     ) {
         this(lineStorageFactory,firstIdComparator, secondaryIdComparator, fileName);
 
-        CompletableFuture<Void> currentWrite = futureLineStorage.thenCompose(ls -> completedFuture(null));
-
         for(Map.Entry<String,String> entry : sortedMap.entrySet()) {
             currentWrite = currentWrite.thenCompose(x -> futureLineStorage)
                     .thenCompose(ls -> ls.appendLine(String.join(DELIMITER, entry.getKey(), entry.getValue())));
         }
-        futureLineStorage = currentWrite.thenCompose(v -> futureLineStorage);
     }
 
     @Override
     public CompletableFuture<FutureStorage> getFuture() {
-        return futureLineStorage.thenCompose(x -> completedFuture(this));
+        return getFutureFutureLineStorage().thenCompose(x -> completedFuture(this));
+    }
+
+    public CompletableFuture<FutureLineStorage> getFutureFutureLineStorage() {
+        return currentWrite.thenCompose(v -> futureLineStorage);
     }
 
     public CompletableFuture<String> get(int index) {
-        return futureLineStorage.thenCompose(ls -> ls.read(index));
+        return getFutureFutureLineStorage().thenCompose(ls -> ls.read(index));
     }
 
     public CompletableFuture<Integer> size() {
-        return futureLineStorage.thenCompose(ls -> ls.numberOfLines());
+        return getFutureFutureLineStorage().thenCompose(FutureLineStorage::numberOfLines);
     }
 
     @Override

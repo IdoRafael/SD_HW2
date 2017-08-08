@@ -12,8 +12,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.1" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.1" level="project" />
     <orderEntry type="module" module-name="buy-app" />
     <orderEntry type="module" module-name="library" />
     <orderEntry type="library" name="Maven: il.ac.technion.cs.sd:buy-external:1.0" level="project" />
